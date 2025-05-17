@@ -1,0 +1,36 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=pwd
+      - MARIADB_DATABASE=dafumarket
+      - MARIADB_USER=dafu
+      - MARIADB_PASSWORD=pwd
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppwd"]
+      interval: 10s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.2
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: dafu
+      PMA_PASSWORD: pwd
+    ports:
+      - "8081:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+volumes:
+  db_data:
+    driver: local
