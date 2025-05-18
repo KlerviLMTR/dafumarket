@@ -21,7 +21,8 @@ class DbSeeder {
             ProduitRepository produitRepo,
             AppartenirCategorieRepository appartenirCategorieRepo,
             PossederLabelRepository possederLabelRepo,
-            PropositionRepository propositionRepo
+            PropositionRepository propositionRepo,
+            AssocierPromoRepository associerPromoRepo
 
     ) {
         return args -> {
@@ -34,6 +35,7 @@ class DbSeeder {
             PromotionSeeder.seedPromotions(promoRepo);
             ProduitSeeder.seedProduits(produitRepo, uniteRepo,marqueRepo,categorieRepo,appartenirCategorieRepo,labelRepo,possederLabelRepo);
             PropositionSeeder.seedPropositions(propositionRepo, magasinRepo, produitRepo);
+            AssocierPromosSeeder.seedAssocierPromos(associerPromoRepo, promoRepo, propositionRepo);
         };
     }
 }
