@@ -1,0 +1,4 @@
+CREATE TABLE label (
+    id_label INT AUTO_INCREMENT PRIMARY KEY,
+    designation VARCHAR(50) NOT NULL
+);
