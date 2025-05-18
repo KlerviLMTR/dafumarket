@@ -1,19 +1,12 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
 import fr.ut1.m2ipm.dafumarket.models.Marque;
 import fr.ut1.m2ipm.dafumarket.repositories.MarqueRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
-// --- SEEDING CONFIGURATION ---
-@Configuration
-@Order(2)
+
 class MarqueSeeder {
-    @Bean
-    CommandLineRunner seedMarques(MarqueRepository marqueRepo) {
+  public static void seedMarques(MarqueRepository marqueRepo) {
 
-        return args -> {
+
             if (marqueRepo.count() == 0) {
                 marqueRepo.save(new Marque(null, "Dafu"));
                 marqueRepo.save(new Marque(null, "Pampers"));
@@ -40,7 +33,6 @@ class MarqueSeeder {
                 marqueRepo.save(new Marque(null, "Bjorg"));
                 marqueRepo.save(new Marque(null, "Kellog's"));
             }
-        };
 
     }
 }

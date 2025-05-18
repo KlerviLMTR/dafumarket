@@ -1,23 +1,17 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
-
 import fr.ut1.m2ipm.dafumarket.models.Categorie;
 import fr.ut1.m2ipm.dafumarket.models.Rayon;
 import fr.ut1.m2ipm.dafumarket.repositories.CategorieRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.RayonRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+
 
 import java.util.List;
 
-@Configuration
-@Order(4)
+
 class CategoriesSeeder {
 
-    @Bean
-    CommandLineRunner seedCategories(CategorieRepository categorieRepo, RayonRepository rayonRepo) {
-        return args -> {
+    public static void seedCategories(CategorieRepository categorieRepo, RayonRepository rayonRepo) {
+
             if (categorieRepo.count() == 0) {
                 // On récupère les rayons par leur intitulé (déjà seedés auparavant)
                 Rayon frais = rayonRepo.findByIntitule("Crèmerie et produits laitiers").orElseThrow();
@@ -72,6 +66,6 @@ class CategoriesSeeder {
                         new Categorie(null, "Vaisselle", entretien)
                 ));
             }
-        };
+
     }
 }

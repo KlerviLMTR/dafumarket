@@ -2,19 +2,10 @@ package fr.ut1.m2ipm.dafumarket.seeders;
 
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.repositories.MagasinRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-
 import java.util.List;
 
-@Configuration
-@Order(6)
 class MagasinSeeder {
-    @Bean
-    CommandLineRunner seedMagasins(MagasinRepository magasinRepo) {
-        return args -> {
+    public static void seedMagasins(MagasinRepository magasinRepo) {
             if (magasinRepo.count() == 0) {
                 magasinRepo.saveAll(List.of(
                         new Magasin(null, "Dafu Lyon", "12A", "12 rue Paul Bert", "Lyon", 69003, "45.75,4.85"),
@@ -26,6 +17,6 @@ class MagasinSeeder {
                         new Magasin(null, "Dafu Labège", "7G", "7 avenue de l'Innovation", "Labège", 31670, "43.54,1.50")
                 ));
             }
-        };
+
     }
 }

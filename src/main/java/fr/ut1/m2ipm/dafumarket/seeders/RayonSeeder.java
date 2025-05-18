@@ -1,17 +1,11 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
 import fr.ut1.m2ipm.dafumarket.models.Rayon;
 import fr.ut1.m2ipm.dafumarket.repositories.RayonRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
-@Configuration
-@Order(3)
+
 class RayonSeeder {
-    @Bean
-    CommandLineRunner seedRayons(RayonRepository rayonRepo) {
-        return args -> {
+
+    public static void seedRayons(RayonRepository rayonRepo) {
 
             if (rayonRepo.count() == 0) {
                 Rayon frais = rayonRepo.save(new Rayon(null, "Crèmerie et produits laitiers"));
@@ -29,6 +23,5 @@ class RayonSeeder {
                 Rayon entretien = rayonRepo.save(new Rayon(null, "Entretien et Nettoyage"));
             }
 
-        };
     }
 }
