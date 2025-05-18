@@ -1,4 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorieId;
+import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabelId;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +17,10 @@ class DbSeeder {
             RayonRepository rayonRepo,
             CategorieRepository categorieRepo,
             LabelRepository labelRepo,
-            PromotionRepository promoRepo
+            PromotionRepository promoRepo,
+            ProduitRepository produitRepo,
+            AppartenirCategorieRepository appartenirCategorieRepo,
+            PossederLabelRepository possederLabelRepo
     ) {
         return args -> {
             UniteSeeder.seedUnites(uniteRepo);
@@ -25,6 +30,7 @@ class DbSeeder {
             LabelSeeder.seedLabels(labelRepo);
             MagasinSeeder.seedMagasins(magasinRepo);
             PromotionSeeder.seedPromotions(promoRepo);
+            ProduitSeeder.seedProduits(produitRepo, uniteRepo,marqueRepo,categorieRepo,appartenirCategorieRepo,labelRepo,possederLabelRepo);
         };
     }
 }
