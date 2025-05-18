@@ -1,15 +1,13 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Marque {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idMarque;
+    @Column(unique = true)
     private String nom;
 
     public Marque() {}
