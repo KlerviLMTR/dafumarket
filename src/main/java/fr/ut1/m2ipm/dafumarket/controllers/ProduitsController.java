@@ -24,7 +24,7 @@ public class ProduitsController {
     }
 
     /**
-     * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
+     * Recupere et renvoie tous les produits indépendamment du magasin qui les propose (prix recommandé et non effectif)
      */
     @GetMapping("/")
     public List<ProduitDTO> getAllProduits() {
@@ -32,7 +32,7 @@ public class ProduitsController {
     }
 
     /**
-     * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
+     *  Recupere et renvoie le produit correspondant à l'identifiant fourni (indépendamment du magasin - prix recommandé uniquement)
      */
         @GetMapping("/{idProduit}")
         public ProduitDTO getProduitById(@PathVariable Integer idProduit){

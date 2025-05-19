@@ -22,7 +22,7 @@ public class PropositionsProduitsController {
 
 
     /**
-     * Cree UNE (pour l'instant) proposition + son produit associé
+     *  Cree UNE (pour l'instant) proposition de test pour un magasin de test choisi + son produit associé (voir classe PropositionService)
      */
     @PostMapping("/")
     public Proposition creerPropositionProduit(){

@@ -31,7 +31,7 @@ public class MagasinController {
 
 
     /**
-     * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
+     * Recupere et renvoie un magasin ainsi que le nombre de produits qu'il propose à partir de son id
      */
     @GetMapping("/{idMagasin}")
     public MagasinDTO getMagasinById(@PathVariable int idMagasin) {
