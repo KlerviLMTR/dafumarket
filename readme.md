@@ -154,7 +154,8 @@
       },
   ]
 
-</details> ```
+</details> 
+
 - `GET /api/produits/{idProduit}`  
   ➜ Récupère un produit par son identifiant (détails + catégories + labels, prix recommandé uniquement).
 ---
