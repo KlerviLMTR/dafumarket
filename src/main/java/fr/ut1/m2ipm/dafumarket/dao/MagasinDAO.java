@@ -67,4 +67,14 @@ public class MagasinDAO {
         }
         return MagasinMapper.toDto(magasin, count);
     }
+
+
+    public Magasin getMagasinDbModelById(int id) {
+        Optional<Magasin> optMagasin = magasinRepo.findById(id);
+        if (optMagasin.isEmpty()) {
+            throw new NoSuchElementException("Magasin introuvable avec l'id : " + id);
+        }
+        return optMagasin.get();
+
+    }
 }
