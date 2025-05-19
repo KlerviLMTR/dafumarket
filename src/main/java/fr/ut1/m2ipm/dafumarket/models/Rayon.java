@@ -2,6 +2,8 @@ package fr.ut1.m2ipm.dafumarket.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Rayon {
     @Id
@@ -9,6 +11,9 @@ public class Rayon {
     private Integer idRayon;
     @Column(unique = true)
     private String intitule;
+
+    @OneToMany(mappedBy = "rayon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Categorie> categories;
 
     public Rayon() {}
     public Rayon(Integer idRayon, String intitule) {
@@ -20,4 +25,7 @@ public class Rayon {
     public void setIdRayon(Integer idRayon) { this.idRayon = idRayon; }
     public String getIntitule() { return intitule; }
     public void setIntitule(String intitule) { this.intitule = intitule; }
+    public List<Categorie> getCategories() { return categories; }
+    public void setCategories(List<Categorie> categories) { this.categories = categories; }
+
 }

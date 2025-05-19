@@ -1,6 +1,9 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Categorie {
@@ -11,6 +14,13 @@ public class Categorie {
     @ManyToOne
     @JoinColumn(name = "id_rayon")
     private Rayon rayon;
+
+    @OneToMany(mappedBy = "categorie")
+    private List<AppartenirCategorie> produits;
+
+    public List<AppartenirCategorie> getProduits() {
+        return produits;
+    }
 
     public Categorie() {}
     public Categorie(Integer idCategorie, String intitule, Rayon rayon) {

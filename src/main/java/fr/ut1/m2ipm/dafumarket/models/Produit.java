@@ -1,6 +1,9 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Produit {
@@ -15,6 +18,13 @@ public class Produit {
     private String origine;
     private double prixRecommande;
     private String imageUrl;
+
+    @OneToMany(mappedBy = "produit")
+    private List<AppartenirCategorie> appartenances;
+
+    public List<AppartenirCategorie> getAppartenances() {
+        return appartenances;
+    }
 
     @ManyToOne
     @JoinColumn(name = "id_unite")
