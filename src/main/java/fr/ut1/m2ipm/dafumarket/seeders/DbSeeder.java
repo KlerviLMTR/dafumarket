@@ -1,6 +1,4 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
-import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorieId;
-import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabelId;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
