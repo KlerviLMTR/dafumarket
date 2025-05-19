@@ -20,7 +20,7 @@
 
 ---
 
-## 💰 Propositions
+## 💰 Propositions 
 
 - `POST /api/propositions/`  
   ➜ Crée une (pour l’instant) proposition de test pour un magasin + son produit associé.  
