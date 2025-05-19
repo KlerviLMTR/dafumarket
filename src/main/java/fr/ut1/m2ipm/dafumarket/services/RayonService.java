@@ -17,4 +17,8 @@ public class RayonService {
     public List<RayonDTO> getAllRayons(){
         return this.rayonDAO.getAllRayons();
     }
+
+    public RayonDTO getRayonById(int id){
+        return this.rayonDAO.getRayonById(id);
+    }
 }

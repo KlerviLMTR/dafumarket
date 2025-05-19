@@ -19,7 +19,7 @@ public class RayonMapper {
      * @param rayon
      * @return RayonDTO
      */
-    public static RayonDTO creerRayonDTO(Rayon rayon) {
+    public static RayonDTO toDto(Rayon rayon) {
         // Creer la liste des categories
         List<CategorieDTO> categories = new ArrayList<>();
         // Iterer sur les categories du rayon
