@@ -27,7 +27,9 @@ public class RayonMapper {
             CategorieDTO categorieDto = new CategorieDTO(categorie.getIdCategorie(), categorie.getIntitule());
             categories.add(categorieDto);
         }
-        return new RayonDTO(rayon.getIdRayon(), rayon.getIntitule(), categories);
+        RayonDTO rayonDTO= new RayonDTO(rayon.getIdRayon(), rayon.getIntitule());
+        rayonDTO.setCategories(categories);
+        return rayonDTO;
     }
 
 

@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class MagasinService {
 
-    private MagasinDAO magasinDAO;
+    private final MagasinDAO magasinDAO;
 
     public MagasinService(MagasinDAO magasinDAO) {
         this.magasinDAO = magasinDAO;

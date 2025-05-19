@@ -2,7 +2,6 @@ package fr.ut1.m2ipm.dafumarket.models.associations;
 import fr.ut1.m2ipm.dafumarket.models.Categorie;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import jakarta.persistence.*;
-import java.util.Objects;
 
 @Entity
 @IdClass(AppartenirCategorieId.class)

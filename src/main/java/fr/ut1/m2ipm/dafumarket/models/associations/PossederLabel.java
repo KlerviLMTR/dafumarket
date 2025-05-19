@@ -3,7 +3,7 @@ import fr.ut1.m2ipm.dafumarket.models.Label;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import jakarta.persistence.*;
 
-import java.util.Objects;
+
 
 @Entity
 @IdClass(PossederLabelId.class)

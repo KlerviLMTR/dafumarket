@@ -1,6 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
+import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabel;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -20,10 +21,17 @@ public class Produit {
     private String imageUrl;
 
     @OneToMany(mappedBy = "produit")
-    private List<AppartenirCategorie> appartenances;
+    private List<AppartenirCategorie> categories;
 
-    public List<AppartenirCategorie> getAppartenances() {
-        return appartenances;
+    public List<AppartenirCategorie> getCategories() {
+        return categories;
+    }
+
+    @OneToMany(mappedBy = "produit")
+    private List<PossederLabel> labels;
+
+    public List<PossederLabel> getLabels() {
+        return labels;
     }
 
     @ManyToOne

@@ -7,7 +7,6 @@ import fr.ut1.m2ipm.dafumarket.repositories.MagasinRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PropositionRepository;
 import org.springframework.stereotype.Component;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class MagasinDAO {

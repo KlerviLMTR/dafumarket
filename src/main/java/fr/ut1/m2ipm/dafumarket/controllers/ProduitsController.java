@@ -1,0 +1,44 @@
+package fr.ut1.m2ipm.dafumarket.controllers;
+import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
+import fr.ut1.m2ipm.dafumarket.services.ProduitService;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+/**
+ * Controleur principal permettant de récupérer des informations liées aux produits.
+ * Ce controleur est essentiellement utilisé dans la vue "non connecté", où on a accès à tous les produits via les rayons et catégories.
+ * Seul le prix recommandé est affiché. Pour les informations liées aux propositions des magasins (prix effectifs, passer par l'endpoint magasins)
+ */
+@RestController
+@RequestMapping("/api/produits")
+public class ProduitsController {
+
+    private final ProduitService produitService;
+
+    public ProduitsController(ProduitService produitService) {
+        this.produitService = produitService;
+    }
+
+    /**
+     * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
+     */
+    @GetMapping("/")
+    public List<ProduitDTO> getAllProduits() {
+        return this.produitService.getAllProduits();
+    }
+
+    /**
+     * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
+     */
+        @GetMapping("/{idProduit}")
+        public ProduitDTO getProduitById(@PathVariable Integer idProduit){
+        return this.produitService.getProduitById(idProduit);
+    }
+
+}
+
+

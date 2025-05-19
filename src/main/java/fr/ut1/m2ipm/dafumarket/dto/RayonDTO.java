@@ -1,7 +1,4 @@
 package fr.ut1.m2ipm.dafumarket.dto;
-
-import fr.ut1.m2ipm.dafumarket.models.Categorie;
-
 import java.util.List;
 
 public class RayonDTO {
@@ -10,7 +7,7 @@ public class RayonDTO {
     private List<CategorieDTO> categories;
 
 
-    public RayonDTO( int idRayon, String nomRayon, List<CategorieDTO> categories) {
+    public RayonDTO( int idRayon, String nomRayon) {
         this.categories = categories;
         this.idRayon = idRayon;
         this.nomRayon = nomRayon;
@@ -25,5 +22,9 @@ public class RayonDTO {
     }
     public String getNomRayon() {
         return this.nomRayon;
+    }
+
+    public void setCategories(List<CategorieDTO> categories) {
+        this.categories = categories;
     }
 }

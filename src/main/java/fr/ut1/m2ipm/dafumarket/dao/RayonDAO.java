@@ -6,7 +6,6 @@ import fr.ut1.m2ipm.dafumarket.mappers.RayonMapper;
 import fr.ut1.m2ipm.dafumarket.models.Rayon;
 import fr.ut1.m2ipm.dafumarket.repositories.RayonRepository;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 

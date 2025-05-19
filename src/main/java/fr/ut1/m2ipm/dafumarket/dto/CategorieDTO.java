@@ -4,6 +4,7 @@ public class CategorieDTO {
 
     private int idCatgorie;
     private String nomCategorie;
+    private RayonDTO rayon;
 
     public CategorieDTO(int idCatgorie, String nomCategorie) {
         this.idCatgorie = idCatgorie;
@@ -18,5 +19,15 @@ public class CategorieDTO {
     public String getNomCategorie() {
         return this.nomCategorie;
     }
+
+    public void setRayonDTO(RayonDTO rayonDTO) {
+        this.rayon = rayonDTO;
+    }
+
+    public RayonDTO getRayonDTO() {
+        return this.rayon;
+    }
+
+
 
 }
