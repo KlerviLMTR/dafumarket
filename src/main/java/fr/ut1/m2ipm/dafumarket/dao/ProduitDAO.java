@@ -8,13 +8,10 @@ import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabel;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-
-import javax.swing.text.html.Option;
 import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class ProduitDAO {
@@ -27,7 +24,7 @@ public class ProduitDAO {
     private final CategorieRepository categorieRepository;
     private final AppartenirCategorieRepository appartenirCategorieRepository;
 
-    public ProduitDAO(ProduitRepository produitRepository, UniteRepository uniteRepository, MarqueRepository marqueRepository, LabelRepository labelRepository, PossederLabelRepository possederLabelRepository,  CategorieRepository categorieRepository, AppartenirCategorieRepository appartenirCategorieRepository) {
+    public ProduitDAO(ProduitRepository produitRepository, UniteRepository uniteRepository, MarqueRepository marqueRepository, LabelRepository labelRepository, PossederLabelRepository possederLabelRepository, CategorieRepository categorieRepository, AppartenirCategorieRepository appartenirCategorieRepository) {
         this.produitRepository = produitRepository;
         this.uniteRepository = uniteRepository;
         this.marqueRepository = marqueRepository;
@@ -37,7 +34,7 @@ public class ProduitDAO {
         this.appartenirCategorieRepository = appartenirCategorieRepository;
     }
 
-    public List<ProduitDTO> getAllProduits(){
+    public List<ProduitDTO> getAllProduits() {
         List<Produit> produits = produitRepository.findAll();
         List<ProduitDTO> produitDTOs = new ArrayList<>();
         for (Produit produit : produits) {
@@ -63,6 +60,7 @@ public class ProduitDAO {
                     Marque nouvelleMarque = new Marque(null, nomMarque);
                     return this.marqueRepository.save(nouvelleMarque);
                 });
+
 
         Unite unite = uniteRepository.findByLibelle(libelleUnite).orElseThrow();
 
