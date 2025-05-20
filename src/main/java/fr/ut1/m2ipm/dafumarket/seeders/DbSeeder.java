@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.seeders;
 
+import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +23,9 @@ class DbSeeder {
             PossederLabelRepository possederLabelRepo,
             PropositionRepository propositionRepo,
             AssocierPromoRepository associerPromoRepo,
-            ProfilTypeRepository profilTypeRepo
+            ProfilTypeRepository profilTypeRepo,
+            CompteRepository compteRepo,
+            ClientRepository clientRepo
 
     ) {
         return args -> {
@@ -37,6 +40,7 @@ class DbSeeder {
             PropositionSeeder.seedPropositions(propositionRepo, magasinRepo, produitRepo);
             AssocierPromosSeeder.seedAssocierPromos(associerPromoRepo, promoRepo, propositionRepo);
             ProfilTypeSeeder.seedProfilType(profilTypeRepo);
+            ClientSeeder.seedClient(clientRepo, compteRepo, profilTypeRepo);
         };
     }
 }
