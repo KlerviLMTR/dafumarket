@@ -30,7 +30,8 @@ class DbSeeder {
             RoleRepository roleRepo,
             PersonnelRepository personnelRepo,
             PanierRepository panierRepo,
-            AppartenirPanierRepository appartenirPanierRepo
+            AppartenirPanierRepository appartenirPanierRepo,
+            CommandeRepository commandeRepo
 
     ) {
         return args -> {
@@ -49,6 +50,7 @@ class DbSeeder {
             RoleSeeder.seedRoles(roleRepo);
             PersonnelSeeder.seedPersonnel(personnelRepo, compteRepo, roleRepo, magasinRepo);
             PanierSeeder.seedPanier(panierRepo, propositionRepo, clientRepo, appartenirPanierRepo);
+            CommandeSeeder.seedCommandes(commandeRepo, panierRepo);
         };
     }
 }
