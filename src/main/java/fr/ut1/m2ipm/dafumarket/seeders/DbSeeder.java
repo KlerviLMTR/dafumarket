@@ -25,7 +25,9 @@ class DbSeeder {
             AssocierPromoRepository associerPromoRepo,
             ProfilTypeRepository profilTypeRepo,
             CompteRepository compteRepo,
-            ClientRepository clientRepo
+            ClientRepository clientRepo,
+            RoleRepository roleRepo,
+            PersonnelRepository personnelRepo
 
     ) {
         return args -> {
@@ -41,6 +43,8 @@ class DbSeeder {
             AssocierPromosSeeder.seedAssocierPromos(associerPromoRepo, promoRepo, propositionRepo);
             ProfilTypeSeeder.seedProfilType(profilTypeRepo);
             ClientSeeder.seedClient(clientRepo, compteRepo, profilTypeRepo);
+            RoleSeeder.seedRoles(roleRepo);
+            PersonnelSeeder.seedPersonnel(personnelRepo, compteRepo, roleRepo, magasinRepo);
         };
     }
 }
