@@ -7,6 +7,7 @@ import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
 import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabel;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ProduitDAO {
     private final CategorieRepository categorieRepository;
     private final AppartenirCategorieRepository appartenirCategorieRepository;
 
-    public ProduitDAO(ProduitRepository produitRepository, UniteRepository uniteRepository, MarqueRepository marqueRepository, LabelRepository labelRepository, PossederLabelRepository possederLabelRepository,  CategorieRepository categorieRepository, AppartenirCategorieRepository appartenirCategorieRepository) {
+    public ProduitDAO(ProduitRepository produitRepository, UniteRepository uniteRepository, MarqueRepository marqueRepository, LabelRepository labelRepository, PossederLabelRepository possederLabelRepository, CategorieRepository categorieRepository, AppartenirCategorieRepository appartenirCategorieRepository) {
         this.produitRepository = produitRepository;
         this.uniteRepository = uniteRepository;
         this.marqueRepository = marqueRepository;
@@ -31,7 +32,7 @@ public class ProduitDAO {
         this.appartenirCategorieRepository = appartenirCategorieRepository;
     }
 
-    public List<ProduitDTO> getAllProduits(){
+    public List<ProduitDTO> getAllProduits() {
         List<Produit> produits = produitRepository.findAll();
         List<ProduitDTO> produitDTOs = new ArrayList<>();
         for (Produit produit : produits) {
@@ -44,10 +45,10 @@ public class ProduitDAO {
         return ProduitMapper.toDto(produitRepository.findById(id).get());
     }
 
-    public Produit creerProduit( String nom, double poids, String description, String nutriscore, String origine,
-                              double prixRecommande, String imageUrl,
-                              String nomMarque, String libelleUnite,
-                              List<String> designationsLabel, List<String> nomsCategories){
+    public Produit creerProduit(String nom, double poids, String description, String nutriscore, String origine,
+                                double prixRecommande, String imageUrl,
+                                String nomMarque, String libelleUnite,
+                                List<String> designationsLabel, List<String> nomsCategories) {
 
         Marque marque = this.marqueRepository.findByNom(nomMarque).orElseThrow();
         Unite unite = uniteRepository.findByLibelle(libelleUnite).orElseThrow();
@@ -64,11 +65,10 @@ public class ProduitDAO {
         }
 
         // Ajout des catégories (relation pivot)
-        for (String  designation : nomsCategories) {
+        for (String designation : nomsCategories) {
             Categorie categorie = this.categorieRepository.findByIntitule(designation).orElseThrow();
             this.appartenirCategorieRepository.save(new AppartenirCategorie(produit, categorie));
         }
-
 
         return produit;
 
