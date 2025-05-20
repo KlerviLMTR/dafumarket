@@ -7,8 +7,11 @@ import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
 import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabel;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.stereotype.Component;
+
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ProduitDAO {
@@ -40,14 +43,17 @@ public class ProduitDAO {
         return produitDTOs;
     }
 
+    public Optional<Produit> findByMarqueNomAndNom(String marque, String nomProduit) {
+        return produitRepository.findByMarqueNomAndNom(marque, nomProduit);
+    }
+
     public ProduitDTO getProduitById(int id) {
         return ProduitMapper.toDto(produitRepository.findById(id).get());
     }
 
     public Produit creerProduit( String nom, double poids, String description, String nutriscore, String origine,
                               double prixRecommande, String imageUrl,
-                              String nomMarque, String libelleUnite,
-                              List<String> designationsLabel, List<String> nomsCategories){
+                              String nomMarque, String libelleUnite, String[] designationsLabel, String[] nomsCategories){
 
         Marque marque = this.marqueRepository.findByNom(nomMarque)
                 .orElseGet(() -> {
@@ -63,13 +69,23 @@ public class ProduitDAO {
         produitRepository.save(produit);
 
         // Ajout des labels (relation pivot)
-        for (String designation : designationsLabel) {
-            Label label = this.labelRepository.findByDesignation(designation).orElseThrow();
-            this.possederLabelRepository.save(new PossederLabel(produit, label));
+        System.out.println("Labels : " + designationsLabel.length);
+        System.out.println("hiha");
+        System.out.println("Labels : " + designationsLabel);
+        if (designationsLabel.length == 0) {
+            System.out.println("Pas de labels");
+        }
+        else {
+            for (String designation : designationsLabel) {
+                System.out.println("Label : " + designation);
+                Label label = this.labelRepository.findByDesignation(designation).orElseThrow();
+                this.possederLabelRepository.save(new PossederLabel(produit, label));
+            }
         }
 
         // Ajout des catégories (relation pivot)
         for (String  designation : nomsCategories) {
+            System.out.println("Categorie : " + designation);
             Categorie categorie = this.categorieRepository.findByIntitule(designation).orElseThrow();
             this.appartenirCategorieRepository.save(new AppartenirCategorie(produit, categorie));
         }
@@ -77,6 +93,10 @@ public class ProduitDAO {
 
         return produit;
 
+    }
+
+    public Produit save(Produit produit) {
+        return produitRepository.save(produit);
     }
 
 }

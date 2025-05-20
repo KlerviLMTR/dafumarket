@@ -22,35 +22,13 @@ public class AdminController {
     }
 
     @PostMapping("/csv")
-    public Proposition creerPropositionProduitsCSV(@RequestParam("file") MultipartFile file) {
+    public Proposition creerPropositionProduitsCSV(@RequestParam("file") MultipartFile file, @RequestParam("idMagasin") int idMagasin) {
         if (file.isEmpty()) {
             throw new RuntimeException("Le fichier est vide");
         }
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Ligne CSV : " + line);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erreur lors de la lecture du fichier", e);
-        }
-
-        return null;
-        //return this.propService.creerPropositionProduit();
-    }
-
-
-    /**
-     *  Cree UNE (pour l'instant) proposition de test pour un magasin de test choisi + son produit associé (voir classe PropositionService)
-     */
-    @PostMapping("/propTest")
-    public Proposition creerPropositionProduit(){
-        return this.propositionService.creerPropositionProduit();
+        System.out.println("abc");
+        return this.propositionService.creerPropositionsProduitsCSV(file,idMagasin);
     }
 
 
