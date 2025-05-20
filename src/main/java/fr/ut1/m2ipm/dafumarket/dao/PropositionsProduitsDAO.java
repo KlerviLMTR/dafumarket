@@ -7,6 +7,8 @@ import fr.ut1.m2ipm.dafumarket.repositories.MagasinRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PropositionRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class PropositionsProduitsDAO {
 
@@ -29,7 +31,18 @@ public class PropositionsProduitsDAO {
         Proposition proposition = new Proposition(produit, magasin, stock, prixPropose);
         Proposition prop = this.propositionRepository.save(proposition);
         return prop;
+    }
 
+    /**
+     * Enregistre une proposition dans la base de données
+     * @param proposition
+     * @return
+     */
+    public Proposition save(Proposition proposition) {
+        return this.propositionRepository.save(proposition);
+    }
 
+    public Optional<Proposition> getPropositionByIdProduitAndIdMagasin(int id_Produit, int id_Magasin) {
+        return this.propositionRepository.findByProduit_IdProduitAndMagasin_IdMagasin(id_Produit, id_Magasin);
     }
 }
