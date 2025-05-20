@@ -23,4 +23,7 @@ public class ProduitService {
         return this.produitDAO.getProduitById(id);
     }
 
+    public List<ProduitDTO> getProduitBySearch(String search, int limit){return this.produitDAO.getProduitBySearch(search, limit);
+    }
+
 }

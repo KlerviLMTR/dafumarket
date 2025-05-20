@@ -6,7 +6,9 @@ import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirCategorie;
 import fr.ut1.m2ipm.dafumarket.models.associations.PossederLabel;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,5 +98,17 @@ public class ProduitDAO {
     public Produit save(Produit produit) {
         return produitRepository.save(produit);
     }
+
+    public List<ProduitDTO> getProduitBySearch(String search, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Produit> produits = produitRepository.findByNomContainingIgnoreCase(search, pageable);
+
+        List<ProduitDTO> produitDTOs = new ArrayList<>();
+        for (Produit produit : produits) {
+            produitDTOs.add(ProduitMapper.toDto(produit));
+        }
+        return produitDTOs;
+    }
+
 
 }
