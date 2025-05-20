@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS magasin (
     ville VARCHAR(100),
     cp VARCHAR(10),
     coordonnees_gps VARCHAR(100),
+    chiffre_affaires DOUBLE default 0,
     PRIMARY KEY (id_magasin)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
