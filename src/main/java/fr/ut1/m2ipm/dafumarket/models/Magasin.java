@@ -17,6 +17,7 @@ public class Magasin {
     private String ville;
     private Integer cp;
     private String coordonneesGps;
+    private Double chiffreAffaires;
 
     public Magasin() {}
 
@@ -28,6 +29,7 @@ public class Magasin {
         this.ville = ville;
         this.cp = cp;
         this.coordonneesGps = coordonneesGps;
+        this.chiffreAffaires = 0.0;
     }
 
     public Integer getIdMagasin() { return idMagasin; }
@@ -44,4 +46,6 @@ public class Magasin {
     public void setCp(Integer cp) { this.cp = cp; }
     public String getCoordonneesGps() { return coordonneesGps; }
     public void setCoordonneesGps(String coordonneesGps) { this.coordonneesGps = coordonneesGps; }
+    public double getChiffreAffaires() { return chiffreAffaires; }
+    public void setChiffreAffaires(double chiffreAffaires){ this.chiffreAffaires = chiffreAffaires; }
 }

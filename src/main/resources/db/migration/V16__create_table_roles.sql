@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS role (
+    id_role   SMALLINT PRIMARY KEY AUTO_INCREMENT,
+    intitule VARCHAR(50) NOT NULL
+    );
