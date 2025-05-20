@@ -29,7 +29,5 @@ public class PropositionsProduitsDAO {
         Proposition proposition = new Proposition(produit, magasin, stock, prixPropose);
         Proposition prop = this.propositionRepository.save(proposition);
         return prop;
-
-
     }
 }

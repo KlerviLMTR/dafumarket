@@ -25,6 +25,7 @@ public class PropositionService {
 
     }
 
+
     public Proposition creerPropositionProduit(){
         // Creer le produit (ici données de test)
         String nom  = "test";
@@ -34,7 +35,7 @@ public class PropositionService {
         String origine = null;
         double prixRec = 42.42;
         String imageUrl = "test.png";
-        String nomMarque = "Nestlé";
+        String nomMarque = "Friskies";
         String libelleUnite = "L";
         List<String> labels = new ArrayList<String>();
         labels.add("Petits prix");

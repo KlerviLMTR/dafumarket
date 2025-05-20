@@ -49,7 +49,12 @@ public class ProduitDAO {
                               String nomMarque, String libelleUnite,
                               List<String> designationsLabel, List<String> nomsCategories){
 
-        Marque marque = this.marqueRepository.findByNom(nomMarque).orElseThrow();
+        Marque marque = this.marqueRepository.findByNom(nomMarque)
+                .orElseGet(() -> {
+                    Marque nouvelleMarque = new Marque(null, nomMarque);
+                    return this.marqueRepository.save(nouvelleMarque);
+                });
+
         Unite unite = uniteRepository.findByLibelle(libelleUnite).orElseThrow();
 
         // Création du produit

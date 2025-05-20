@@ -1,38 +1,24 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
+
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.services.PropositionService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-
-/**
- * Controleur principal permettant de récupérer des informations liées aux produits.
- * Ce controleur est essentiellement utilisé dans la vue "non connecté", où on a accès à tous les produits via les rayons et catégories.
- * Seul le prix recommandé est affiché. Pour les informations liées aux propositions des magasins (prix effectifs, passer par l'endpoint magasins)
- */
 @RestController
-@RequestMapping("/api/propositions")
-public class PropositionsProduitsController {
+@RequestMapping("/api/admin")
+public class AdminController {
+    private PropositionService propositionService;
 
-    private final PropositionService propService;
-
-    public PropositionsProduitsController(PropositionService propService) {
-        this.propService = propService;
-    }
-
-
-    /**
-     *  Cree UNE (pour l'instant) proposition de test pour un magasin de test choisi + son produit associé (voir classe PropositionService)
-     */
-    @PostMapping("/")
-    public Proposition creerPropositionProduit(){
-        return this.propService.creerPropositionProduit();
+    public AdminController(PropositionService propositionService) {
+        this.propositionService = propositionService;
     }
 
     @PostMapping("/csv")
@@ -58,6 +44,14 @@ public class PropositionsProduitsController {
         //return this.propService.creerPropositionProduit();
     }
 
+
+    /**
+     *  Cree UNE (pour l'instant) proposition de test pour un magasin de test choisi + son produit associé (voir classe PropositionService)
+     */
+    @PostMapping("/propTest")
+    public Proposition creerPropositionProduit(){
+        return this.propositionService.creerPropositionProduit();
+    }
+
+
 }
-
-
