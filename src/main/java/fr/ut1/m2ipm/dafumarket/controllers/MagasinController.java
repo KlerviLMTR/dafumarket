@@ -24,7 +24,7 @@ public class MagasinController {
     /**
      * Recupere et renvoie tous les magasins ainsi que le nombre de produits qu'ils proposent
      */
-    @GetMapping("/")
+    @GetMapping
     public List<MagasinDTO> getAllMagasins() {
         return this.magasinService.getAllMagasinsAvecNombreProduits();
     }
@@ -37,6 +37,8 @@ public class MagasinController {
     public MagasinDTO getMagasinById(@PathVariable int idMagasin) {
         return this.magasinService.getMagasinById( idMagasin);
     }
+
+
 
 
 }

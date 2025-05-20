@@ -23,7 +23,7 @@ public class ProduitsController {
     /**
      * Recupere et renvoie tous les produits indépendamment du magasin qui les propose (prix recommandé et non effectif)
      */
-    @GetMapping("/")
+    @GetMapping
     public List<ProduitDTO> getAllProduits() {
         return this.produitService.getAllProduits();
     }
