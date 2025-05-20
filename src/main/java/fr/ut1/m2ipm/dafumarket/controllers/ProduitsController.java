@@ -1,11 +1,8 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.services.ProduitService;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
@@ -38,6 +35,16 @@ public class ProduitsController {
         public ProduitDTO getProduitById(@PathVariable Integer idProduit){
         return this.produitService.getProduitById(idProduit);
     }
+
+    /**
+     *  Recupere et renvoie tous les produits correspondant à la recherche fournie (indépendamment du magasin - prix recommandé uniquement)
+     */
+    @GetMapping("/search")
+    public List<ProduitDTO> getProduitBySearch(@RequestParam("search") String search,
+                                               @RequestParam("limit") int limit) {
+        return produitService.getProduitBySearch(search, limit);
+    }
+
 
 }
 
