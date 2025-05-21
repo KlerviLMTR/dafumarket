@@ -108,29 +108,6 @@ public class ClientService {
 
 
 
-//    public Panier createOrGetActivePanier(long idClient){
-//        Optional<Panier> p = getActivePanierByIdClient(idClient);
-//        if(p.isPresent()){
-//            return p.get();
-//        }
-//        else{
-//
-//            return this.clientDao.createPanier( idClient);
-//
-//        }
-//    }
-
-
-//
-//    public Panier ajouterProduitAuPanier(long idClient, int idProduit, int quantite, int idMagasin) {
-//        if (quantite <= 0) {
-//            throw new IllegalArgumentException("La quantité doit être supérieure à zéro.");
-//        }
-//
-//
-//    }
-    
-    
     
     
     

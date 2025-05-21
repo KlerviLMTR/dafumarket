@@ -41,7 +41,25 @@ public class Commande {
         this.dateHeureRetrait = dateHeureRetrait;
     }
 
-    // — getters & setters existants —
+    public Long getIdCommande() {
+        return idCommande;
+    }
+    public void setIdCommande(Long idCommande) {
+        this.idCommande  = idCommande;
+    }
+    public Panier getPanier() {
+        return panier;
+    }
+    public void setPanier(Panier panier) {
+        this.panier = panier;
+    }
+    public CommandeStatut getStatut() {
+        return statut;
+    }
+    public void setStatut(CommandeStatut statut) {
+        this.statut = statut;
+    }
+
 
     public LocalDateTime getDateHeureRetrait() {
         return dateHeureRetrait;
