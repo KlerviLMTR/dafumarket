@@ -164,4 +164,6 @@ public class MagasinDAO {
         return propOpt.orElse(null);
 
     }
+
+
 }
