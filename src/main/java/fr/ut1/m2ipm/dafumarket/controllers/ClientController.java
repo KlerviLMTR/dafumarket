@@ -28,19 +28,25 @@ public class ClientController {
      * @return Commande
      */
     @GetMapping("/{idClient}")
-    public List<Commande> getTousLesRayons(@PathVariable long idClient) {
+    public List<Commande> getTousLesRayons(@PathVariable int idClient) {
         return this.clientService.getAllCommandesByIdClient(idClient);
     }
 
     @GetMapping("/{idClient}/paniers")
-    public Optional<Panier> getActivePanierByIdClient(@PathVariable long idClient) {
+    public Optional<Panier> getActivePanierByIdClient(@PathVariable int  idClient) {
         return this.clientService.getActivePanierByIdClient(idClient);
     }
 
-    @PostMapping("/{idClient}/paniers")
-    public Panier createPanier(@PathVariable long idClient) {
-        return this.clientService.createPanier(idClient);
+    //@PostMapping("/{idClient}/paniers")
+    //public Panier createPanier(@PathVariable long idClient) {
+    //    return this.clientService.createPanier(idClient);
 
+    //}
+
+    @PostMapping("/{idClient}/paniers")
+    public Panier ajouterProduitAuPanier(@PathVariable long idClient,
+    @RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite,  @RequestParam(value = "idMagasin") int idMagasin) {
+        return this.clientService.ajouterProduitAuPanier(idClient, idProduit, quantite,idMagasin);
     }
 
 }

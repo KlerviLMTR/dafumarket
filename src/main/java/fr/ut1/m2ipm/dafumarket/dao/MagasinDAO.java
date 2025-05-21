@@ -154,4 +154,19 @@ public class MagasinDAO {
             return Optional.empty();
         }
     }
+
+    public Optional<Proposition> getPropositionProduitByIdProduitAndIdMagasin(int idMagasin, int idProduit) {
+        // 1️⃣ Vérifier que le magasin existe
+        Magasin magasin = magasinRepo.findById(idMagasin).orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        System.out.println(magasin);
+
+        Produit produit = produitRepo.getReferenceById(idProduit);
+
+
+        return propositionRepo.findByProduit_IdProduitAndMagasin_IdMagasin(idProduit, idMagasin);
+
+
+
+
+    }
 }
