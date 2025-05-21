@@ -1,7 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
-
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "commande")
@@ -25,35 +25,29 @@ public class Commande {
     @Column(name = "statut", length = 20, nullable = false)
     private CommandeStatut statut;
 
+    // ← Nouveau champ :
+    @Column(name = "date_heure_retrait", columnDefinition = "DATETIME")
+    private LocalDateTime dateHeureRetrait;
+
     public Commande() {}
 
-    public Commande(Long idCommande, Panier panier, CommandeStatut statut) {
-        this.idCommande = idCommande;
-        this.panier     = panier;
-        this.statut     = statut;
+    public Commande(Long idCommande,
+                    Panier panier,
+                    CommandeStatut statut,
+                    LocalDateTime dateHeureRetrait) {
+        this.idCommande       = idCommande;
+        this.panier           = panier;
+        this.statut           = statut;
+        this.dateHeureRetrait = dateHeureRetrait;
     }
 
-    public Long getIdCommande() {
-        return idCommande;
+    // — getters & setters existants —
+
+    public LocalDateTime getDateHeureRetrait() {
+        return dateHeureRetrait;
     }
 
-    public void setIdCommande(Long idCommande) {
-        this.idCommande = idCommande;
-    }
-
-    public Panier getPanier() {
-        return panier;
-    }
-
-    public void setPanier(Panier panier) {
-        this.panier = panier;
-    }
-
-    public CommandeStatut getStatut() {
-        return statut;
-    }
-
-    public void setStatut(CommandeStatut statut) {
-        this.statut = statut;
+    public void setDateHeureRetrait(LocalDateTime dateHeureRetrait) {
+        this.dateHeureRetrait = dateHeureRetrait;
     }
 }
