@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/preparateur")
+@RequestMapping("/api/preparateurs")
 public class PreparateurController {
     private MagasinService magasinService;
 
@@ -27,6 +27,18 @@ public class PreparateurController {
 
         return this.magasinService.getAllCommandesAPreparer();
     }
+
+    /**
+     * Statut = start ou end, à gérer côté front quand le préparateur commence (click bouton) puis termine la prépa
+     * @param idCommande
+     * @param statut
+     * @return
+     */
+    @PatchMapping("/commandes/{idCommande}")
+    public CommandeDTO prendreEnMainCommande(@PathVariable int idCommande, @RequestParam String statut) {
+        return this.magasinService.prendreEnMainCommande(idCommande, statut);
+    }
+
 
 
 }

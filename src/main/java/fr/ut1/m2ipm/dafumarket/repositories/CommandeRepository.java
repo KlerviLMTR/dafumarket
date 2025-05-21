@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface CommandeRepository extends JpaRepository<Commande, String> {
+public interface CommandeRepository extends JpaRepository<Commande, Long> {
     /**
      * Recherche d'une commande par l'identifiant de son panier.
      */

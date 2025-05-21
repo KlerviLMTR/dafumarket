@@ -1,9 +1,12 @@
 package fr.ut1.m2ipm.dafumarket.services;
+import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.CommandeStatut;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +17,14 @@ import java.util.Optional;
 public class MagasinService {
 
     private final MagasinDAO magasinDAO;
+    private final CommandeDAO commandeDAO;
+    private final CommandeMapper commandeMapper;
 
-    public MagasinService(MagasinDAO magasinDAO) {
+
+    public MagasinService(MagasinDAO magasinDAO,CommandeDAO commandeDAO, CommandeMapper commandeMapper) {
         this.magasinDAO = magasinDAO;
+        this.commandeDAO = commandeDAO;
+        this.commandeMapper = commandeMapper;
     }
 
     public List<MagasinDTO> getAllMagasinsAvecNombreProduits(){
@@ -47,6 +55,33 @@ public class MagasinService {
 
 
         return this.magasinDAO.getAllCommandesAPreparer();
+    }
+
+
+    public CommandeDTO prendreEnMainCommande(int idCommande, String statut){
+        // 1 . Retrouver la commande
+        Commande c = this.commandeDAO.getCommandeDbByID(idCommande);
+        if (c !=null){
+            System.out.println("Commande trouvée!");
+            //2 MAJ du statut
+            String st ="";
+            if (statut.equals("start")) {
+                st = CommandeStatut.EN_PREPARATION.name();
+            }
+            else if (statut.equals("end")) {
+                st = CommandeStatut.PRET.name();
+            }
+            else {
+                throw new NoSuchElementException();
+            }
+            Commande commandeMAJ = this.commandeDAO.mettreAJourStatutCommande(c, st);
+
+            return this.commandeMapper.toDto(commandeMAJ);
+
+        }
+        throw new NoSuchElementException();
+
+
     }
 
 
