@@ -20,7 +20,7 @@ public interface AssocierPromoRepository extends JpaRepository<AssocierPromo, As
     Optional<AssocierPromo> findActiveByProduitAndMagasin(@Param("idProduit") Integer idProduit, @Param("idMagasin") Integer idMagasin);
 
 
-
+    Integer proposition(Proposition proposition);
 }
 
 
