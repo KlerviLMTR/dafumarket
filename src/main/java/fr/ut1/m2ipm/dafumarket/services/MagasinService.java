@@ -1,4 +1,5 @@
 package fr.ut1.m2ipm.dafumarket.services;
+
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
@@ -17,11 +18,11 @@ public class MagasinService {
         this.magasinDAO = magasinDAO;
     }
 
-    public List<MagasinDTO> getAllMagasinsAvecNombreProduits(){
+    public List<MagasinDTO> getAllMagasinsAvecNombreProduits() {
         return this.magasinDAO.getAllMagasinsAvecNombreProduits();
     }
 
-    public MagasinDTO getMagasinById(int id){
+    public MagasinDTO getMagasinById(int id) {
         return this.magasinDAO.getMagasinById(id);
     }
 
@@ -31,14 +32,23 @@ public class MagasinService {
 
     /**
      * Recupere un produit d'id donné proposé par un magasin d'id donné
+     *
      * @param idMagasin
      * @param idProduit
      * @return
      */
     public Optional<ProduitProposeDTO> getproduitProposeMagasinById(int idMagasin, int idProduit) {
 
-        return  this.magasinDAO.getProduitProposeMagasinById( idMagasin,  idProduit);
+        return this.magasinDAO.getProduitProposeMagasinById(idMagasin, idProduit);
 
 
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinRayon(int idMagasin, int idRayon) {
+        return this.magasinDAO.getAllProduitsProposesMagasinRayon(idMagasin, idRayon);
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinCategorie(int idMagasin, int idRayon) {
+        return this.magasinDAO.getAllProduitsProposesMagasinCategorie(idMagasin, idRayon);
     }
 }
