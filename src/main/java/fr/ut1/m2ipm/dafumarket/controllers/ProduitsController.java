@@ -1,4 +1,5 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
+
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.services.ProduitService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,7 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controleur principal permettant de récupérer des informations liées aux produits.
@@ -32,13 +35,22 @@ public class ProduitsController {
     }
 
     /**
-     *  Recupere et renvoie le produit correspondant à l'identifiant fourni (indépendamment du magasin - prix recommandé uniquement)
+     * Recupere et renvoie le produit correspondant à l'identifiant fourni (indépendamment du magasin - prix recommandé uniquement)
      */
-        @GetMapping("/{idProduit}")
-        public ProduitDTO getProduitById(@PathVariable Integer idProduit){
+    @GetMapping("/{idProduit}")
+    public ProduitDTO getProduitById(@PathVariable Integer idProduit) {
         return this.produitService.getProduitById(idProduit);
     }
 
+    @GetMapping(value = {"/rayon/{idRayon}"})
+    public List<ProduitDTO> getProduitsByRayon(@PathVariable Integer idRayon) {
+        return this.produitService.getProduitsByRayon(idRayon);
+    }
+
+    @GetMapping(value = {"/categorie/{idCategorie}"})
+    public List<ProduitDTO> getProduitsByCategorie(@PathVariable Integer idCategorie) {
+        return this.produitService.getProduitsByCategorie(idCategorie);
+    }
 }
 
 
