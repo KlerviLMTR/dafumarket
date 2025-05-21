@@ -2,13 +2,12 @@ package fr.ut1.m2ipm.dafumarket.controllers;
 
 import fr.ut1.m2ipm.dafumarket.dto.RayonDTO;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlleur principal permettant de récupérer des informations liées aux clients
@@ -31,6 +30,17 @@ public class ClientController {
     @GetMapping("/{idClient}")
     public List<Commande> getTousLesRayons(@PathVariable long idClient) {
         return this.clientService.getAllCommandesByIdClient(idClient);
+    }
+
+    @GetMapping("/{idClient}/paniers")
+    public Optional<Panier> getActivePanierByIdClient(@PathVariable long idClient) {
+        return this.clientService.getActivePanierByIdClient(idClient);
+    }
+
+    @PostMapping("/{idClient}/paniers")
+    public Panier createPanier(@PathVariable long idClient) {
+        return this.clientService.createPanier(idClient);
+
     }
 
 }

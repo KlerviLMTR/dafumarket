@@ -54,7 +54,6 @@ public class ProduitProposeMapper {
 
         // Si une promo est active, appliquer le calcul
         if (promo != null) {
-
             int taux = promo.getTauxPromo().intValue();
             dto.setTauxPromo(taux);
             double prixAvecPromo = prop.getPrix() * (1 - taux / 100.0);
