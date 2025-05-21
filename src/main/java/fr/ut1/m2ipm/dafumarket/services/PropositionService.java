@@ -2,8 +2,7 @@ package fr.ut1.m2ipm.dafumarket.services;
 
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.ProduitDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PropositionsProduitsDAO;
-import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
+import fr.ut1.m2ipm.dafumarket.dao.PropositionProduitDAO;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
@@ -13,23 +12,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.*;
-import java.nio.file.StandardCopyOption;
 
 
 @Service
 public class PropositionService {
 
-    private final PropositionsProduitsDAO propositionProduitDAO;
+    private final PropositionProduitDAO propositionProduitDAO;
     private final ProduitDAO produitDAO;
     private final MagasinDAO magasinDAO;
 
-    public PropositionService(PropositionsProduitsDAO propositionProduitDAO, ProduitDAO produitDAO, MagasinDAO magasinDAO) {
+    public PropositionService(PropositionProduitDAO propositionProduitDAO, ProduitDAO produitDAO, MagasinDAO magasinDAO) {
         this.propositionProduitDAO = propositionProduitDAO;
         this.produitDAO = produitDAO;
         this.magasinDAO = magasinDAO;

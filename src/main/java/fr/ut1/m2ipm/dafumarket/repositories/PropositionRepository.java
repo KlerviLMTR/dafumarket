@@ -25,4 +25,8 @@ public interface PropositionRepository extends JpaRepository<Proposition, Propos
 
 
     Optional<Proposition> findByProduit_IdProduitAndMagasin_IdMagasin(int idProduit, int idMagasin);
+
+
+    List<Proposition> findAllByMagasin_IdMagasin(Integer idMagasin);
+
 }

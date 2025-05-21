@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import fr.ut1.m2ipm.dafumarket.services.MagasinService;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -36,6 +37,15 @@ public class MagasinController {
     @GetMapping("/{idMagasin}")
     public MagasinDTO getMagasinById(@PathVariable int idMagasin) {
         return this.magasinService.getMagasinById( idMagasin);
+    }
+
+
+    /**
+     * Recupere et renvoie un magasin ainsi que le nombre de produits qu'il propose à partir de son id
+     */
+    @GetMapping("/{idMagasin}/produits")
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasin(@PathVariable int idMagasin) {
+        return this.magasinService.getAllProduitsProposesMagasin( idMagasin);
     }
 
 
