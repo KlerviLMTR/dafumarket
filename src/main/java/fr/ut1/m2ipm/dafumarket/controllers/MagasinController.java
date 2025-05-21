@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlleur principal permettant de récupérer des informations liées aux rayons
@@ -46,6 +47,14 @@ public class MagasinController {
     @GetMapping("/{idMagasin}/produits")
     public List<ProduitProposeDTO> getAllProduitsProposesMagasin(@PathVariable int idMagasin) {
         return this.magasinService.getAllProduitsProposesMagasin( idMagasin);
+    }
+
+    /**
+     * Recupere et renvoie la proposition de produit d'id donné pour un magasin donné
+     */
+    @GetMapping("/{idMagasin}/produits/{idProduit}")
+    public Optional<ProduitProposeDTO> getproduitProposeMagasinById(@PathVariable int idMagasin, @PathVariable int idProduit) {
+        return this.magasinService.getproduitProposeMagasinById(idMagasin , idProduit);
     }
 
 

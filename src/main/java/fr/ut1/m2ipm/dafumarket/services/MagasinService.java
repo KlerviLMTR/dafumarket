@@ -5,6 +5,8 @@ import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class MagasinService {
@@ -25,5 +27,18 @@ public class MagasinService {
 
     public List<ProduitProposeDTO> getAllProduitsProposesMagasin(int idMagasin) {
         return this.magasinDAO.getAllProduitsProposesMagasin(idMagasin);
+    }
+
+    /**
+     * Recupere un produit d'id donné proposé par un magasin d'id donné
+     * @param idMagasin
+     * @param idProduit
+     * @return
+     */
+    public Optional<ProduitProposeDTO> getproduitProposeMagasinById(int idMagasin, int idProduit) {
+
+        return  this.magasinDAO.getProduitProposeMagasinById( idMagasin,  idProduit);
+
+
     }
 }
