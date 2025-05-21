@@ -1,26 +1,33 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
 
+import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.repositories.ClientRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class ClientDAO {
 
+
     private final ClientRepository clientRepository;
     private final PanierRepository panierRepository;
+    private final PanierMapper panierMapper;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
+        this.panierMapper = panierMapper;
     }
 
 
@@ -28,18 +35,29 @@ public class ClientDAO {
         return this.clientRepository.findCommandesByClientId(idClient);
     }
 
-    public Optional<Panier> getActivePanierByIdClient(long idClient) {
-        return this.clientRepository.getActivePanierByIdClient(idClient);
+    public Optional<PanierDTO> getActivePanierByIdClient(long idClient) {
+
+        Optional<Panier> opt = clientRepository.getActivePanierByIdClient(idClient);
+        if (opt.isPresent()) {
+            Panier panier = opt.get();
+            return Optional.of(panierMapper.toDto(panier));
+        }
+        return Optional.empty();
+
     }
 
+    public Optional<Panier> getActivePanierDbByIdClient(long idClient) {
+        return clientRepository.getActivePanierByIdClient(idClient);
+    }
+
+    @Transactional
     public Panier createPanier( long idClient) {
         Client client = clientRepository.findById(idClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé"));
-
         Panier panier = new Panier();
         panier.setClient(client);
-
-        return panierRepository.save(panier);
+        panierRepository.save(panier);
+        return panier;
     }
 }
 

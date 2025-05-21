@@ -57,6 +57,8 @@ public class ProduitProposeMapper {
             int taux = promo.getTauxPromo().intValue();
             dto.setTauxPromo(taux);
             double prixAvecPromo = prop.getPrix() * (1 - taux / 100.0);
+            prixAvecPromo = Math.round(prixAvecPromo*100.0)/100.0;
+
             dto.setPrixAvecPromo(prixAvecPromo);
         }
 

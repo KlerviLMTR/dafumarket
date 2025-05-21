@@ -18,8 +18,6 @@ public interface AssocierPromoRepository extends JpaRepository<AssocierPromo, As
 
     @Query(value = "SELECT * FROM associer_promo WHERE id_produit = :idProduit AND id_magasin = :idMagasin AND CURDATE() BETWEEN date_debut AND date_fin", nativeQuery = true)
     Optional<AssocierPromo> findActiveByProduitAndMagasin(@Param("idProduit") Integer idProduit, @Param("idMagasin") Integer idMagasin);
-
-
     Integer proposition(Proposition proposition);
 }
 
