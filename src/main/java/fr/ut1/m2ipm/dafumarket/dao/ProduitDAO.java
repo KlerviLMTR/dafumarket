@@ -51,6 +51,14 @@ public class ProduitDAO {
         return ProduitMapper.toDto(produitRepository.findById(id).get());
     }
 
+    public List<ProduitDTO> getProduitsByRayonId(int id) {
+        return produitRepository.produitsByRayon(id).stream().map(ProduitMapper::toDto).toList();
+    }
+
+    public List<ProduitDTO> getProduitsByCategorieId(int id) {
+        return produitRepository.produitsByCategorie(id).stream().map(ProduitMapper::toDto).toList();
+    }
+
     public Produit creerProduit( String nom, double poids, String description, String nutriscore, String origine,
                               double prixRecommande, String imageUrl,
                               String nomMarque, String libelleUnite, String[] designationsLabel, String[] nomsCategories){
