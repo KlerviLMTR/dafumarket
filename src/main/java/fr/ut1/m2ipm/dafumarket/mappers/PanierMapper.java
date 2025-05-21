@@ -32,6 +32,7 @@ public class PanierMapper {
             // recherche de la promo active
             Optional<AssocierPromo> opt = promoRepo.findActiveByProduitAndMagasin(
                     p.getIdProduit(), prop.getMagasin().getIdMagasin());
+
             int taux = opt.map(a -> a.getPromotion().getTauxPromo().intValue()).orElse(0);
 
             double prixMagasin = prop.getPrix();
