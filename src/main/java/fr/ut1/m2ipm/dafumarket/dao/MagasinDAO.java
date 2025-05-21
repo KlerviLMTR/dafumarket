@@ -154,4 +154,14 @@ public class MagasinDAO {
             return Optional.empty();
         }
     }
+
+    public Proposition getProduitProposeDbMagasinById(int idMagasin, int idProduit) {
+        Magasin magasin = magasinRepo.findById(idMagasin)
+                .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        Produit produit = produitRepo.getReferenceById(idProduit);
+        Optional<Proposition> propOpt = propositionRepo
+                .findByProduit_IdProduitAndMagasin_IdMagasin(idProduit, idMagasin);
+        return propOpt.orElse(null);
+
+    }
 }
