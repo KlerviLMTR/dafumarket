@@ -1,14 +1,18 @@
 package fr.ut1.m2ipm.dafumarket.models;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-public class Compte {
+public class Compte implements UserDetails {
 
     @Id
-    @Column(length = 100)
+    @Column(length = 100, nullable = false, unique = true)
     private String login;
     private String password;
     private Timestamp createdAt;
@@ -22,8 +26,18 @@ public class Compte {
         this.login = login;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.login;
     }
 
     public void setPassword(String password) {

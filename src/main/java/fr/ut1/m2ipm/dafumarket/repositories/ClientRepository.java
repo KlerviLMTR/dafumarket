@@ -13,10 +13,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     /**
      * Récupère toutes les commandes passées par un client donné.
      * (Passer par le panier et trouver les instances de commandes associées)
+     *
      * @param clientId l'ID du client
      * @return la liste des commandes du client
      */
     @Query("select cmd from Commande cmd where cmd.panier.client.idClient = :clientId")
     List<Commande> findCommandesByClientId(@Param("clientId") Long clientId);
 
+    @Query("SELECT c FROM Client c, Compte cpt WHERE cpt.login = :compte")
+    Client findByCompte(@Param("compte") String idCompte);
 }
