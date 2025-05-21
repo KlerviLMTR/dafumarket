@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit, Integer> {
     @Query(value = "SELECT DISTINCT p.* " +
@@ -24,4 +28,9 @@ public interface ProduitRepository extends JpaRepository<Produit, Integer> {
             "AND c.id_categorie = ac.id_categorie " +
             "AND ac.id_produit = p.id_produit", nativeQuery = true)
     List<Produit> produitsByCategorie(@Param("categorie") int idCategorie);
+
+    Optional<Produit> findByMarqueNomAndNom(String marque, String nomProduit);
+
+    List<Produit> findByNomContainingIgnoreCase(String nom, Pageable pageable);
+
 }

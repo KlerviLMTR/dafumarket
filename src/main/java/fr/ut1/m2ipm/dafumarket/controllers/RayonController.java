@@ -24,7 +24,7 @@ public class RayonController {
      * Recupere et renvoie la liste des rayons disponibles en drive ainsi que leurs découpages en catégories
      * @return List<RayonDTO>
      */
-    @GetMapping("/")
+    @GetMapping
     public List<RayonDTO> getTousLesRayons() {
         return this.rayonService.getAllRayons();
     }
