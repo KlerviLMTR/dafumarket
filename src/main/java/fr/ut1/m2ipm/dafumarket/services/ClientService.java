@@ -3,7 +3,9 @@ package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
@@ -30,7 +32,8 @@ public class ClientService {
         this.panierMapper = panierMapper;
     }
 
-    public List<Commande> getAllCommandesByIdClient(long idClient){
+    public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
+
         return this.clientDao.getAllCommandesByIdClient(idClient);
     }
 

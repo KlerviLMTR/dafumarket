@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
@@ -26,10 +27,10 @@ public class ClientController {
 
     /**
      * Recupere et renvoie les commandes correspondant à l'id du client fourni
-     * @return Commande
+     * @return  List<CommandeDTO>
      */
     @GetMapping("/{idClient}")
-    public List<Commande> getTousLesRayons(@PathVariable long idClient) {
+    public List<CommandeDTO> getToutesLesCommandes(@PathVariable long idClient) {
         return this.clientService.getAllCommandesByIdClient(idClient);
     }
 
