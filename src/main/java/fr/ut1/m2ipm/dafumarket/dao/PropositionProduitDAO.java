@@ -2,22 +2,29 @@ package fr.ut1.m2ipm.dafumarket.dao;
 
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
+import fr.ut1.m2ipm.dafumarket.models.Promotion;
+import fr.ut1.m2ipm.dafumarket.models.associations.AssocierPromo;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
+import fr.ut1.m2ipm.dafumarket.repositories.AssocierPromoRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.MagasinRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PropositionRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Component
-public class PropositionsProduitsDAO {
+public class PropositionProduitDAO {
 
     private final MagasinRepository magasinRepository;
     private final PropositionRepository propositionRepository;
+    private final AssocierPromoRepository associerPromoRepository;
 
-    public PropositionsProduitsDAO(MagasinRepository magasinRepository, PropositionRepository propositionRepository) {
+    public PropositionProduitDAO(MagasinRepository magasinRepository, PropositionRepository propositionRepository, AssocierPromoRepository associerPromoRepository) {
         this.magasinRepository = magasinRepository;
         this.propositionRepository = propositionRepository;
+        this.associerPromoRepository = associerPromoRepository;
     }
 
     /**
@@ -45,4 +52,6 @@ public class PropositionsProduitsDAO {
     public Optional<Proposition> getPropositionByIdProduitAndIdMagasin(int id_Produit, int id_Magasin) {
         return this.propositionRepository.findByProduit_IdProduitAndMagasin_IdMagasin(id_Produit, id_Magasin);
     }
+
+
 }

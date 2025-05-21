@@ -1,9 +1,16 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.ProduitProposeMapper;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
+import fr.ut1.m2ipm.dafumarket.models.Promotion;
+import fr.ut1.m2ipm.dafumarket.models.associations.AssocierPromo;
+import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
+import fr.ut1.m2ipm.dafumarket.repositories.AssocierPromoRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.MagasinRepository;
+import fr.ut1.m2ipm.dafumarket.repositories.PromotionRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PropositionRepository;
 import org.springframework.stereotype.Component;
 import java.util.*;
@@ -13,10 +20,15 @@ public class MagasinDAO {
 
     private final MagasinRepository magasinRepo;
     private final PropositionRepository propositionRepo;
+    private final PropositionProduitDAO propositionDAO;
+    private final AssocierPromoRepository associerPromoRepository;
 
-    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo) {
+    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository) {
         this.magasinRepo = magasinRepo;
         this.propositionRepo = propositionRepo;
+        this.propositionDAO = propositionDAO;
+        this.associerPromoRepository = associerPromoRepository;
+
     }
 
     public List<MagasinDTO> getAllMagasinsAvecNombreProduits() {
@@ -76,5 +88,38 @@ public class MagasinDAO {
         }
         return optMagasin.get();
 
+    }
+
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasin(int idMagasin) {
+        List<ProduitProposeDTO> produitsProposesDTO = new ArrayList<>();
+        System.out.println("Debut recherche produits");
+        Magasin magasin = this.magasinRepo.findById(idMagasin)
+                .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        System.out.println("Magasin : " + magasin);
+
+        // Recuperer les produits proposes par le magasin
+        List<Proposition> produitsProposes = this.propositionRepo.findAllByMagasin_IdMagasin( idMagasin);
+        // Iterer sur la liste des propositions et y ajouter les promos trouvées si elles sont valides
+        for (Proposition p : produitsProposes){
+            // Cherche une promotion active (période actuelle)
+            Optional<AssocierPromo> optAssoc = associerPromoRepository
+                    .findActiveByProduitAndMagasin(
+                            p.getProduit().getIdProduit(),
+                            idMagasin
+                    );
+
+            Promotion promo = optAssoc
+                    .map(AssocierPromo::getPromotion)
+                    .orElse(null);
+
+
+
+
+            ProduitProposeDTO dto = ProduitProposeMapper.toDto(p, promo);
+            produitsProposesDTO.add(dto);
+        }
+
+        return produitsProposesDTO;
     }
 }

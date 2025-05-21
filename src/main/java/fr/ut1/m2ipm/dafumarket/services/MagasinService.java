@@ -1,6 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,5 +21,9 @@ public class MagasinService {
 
     public MagasinDTO getMagasinById(int id){
         return this.magasinDAO.getMagasinById(id);
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasin(int idMagasin) {
+        return this.magasinDAO.getAllProduitsProposesMagasin(idMagasin);
     }
 }
