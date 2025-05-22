@@ -49,16 +49,15 @@ public class ClientService {
         if (!optPanier.isPresent()) {
             // 1.bis Alors il faut creer le panier
             panierEntity =this.clientDao.createPanier(idClient);
-            System.out.println("PANIER CREE : "+ panierEntity);
+           // System.out.println("PANIER CREE : "+ panierEntity);
         }
         else {
             panierEntity = optPanier.get();
-            System.out.println("PANIER PRESENT : "+ panierEntity);
         }
         // 2. Verifier que le produit est bien propose par le magasin
         Proposition proposition = this.magasinDao.getProduitProposeDbMagasinById(idMagasin, idProduit);
         if (proposition != null) {
-            System.out.println("La proposition existe bien :"+ proposition);
+          //  System.out.println("La proposition existe bien :"+ proposition);
             //3. L'ajouter
         }else{
             throw new EntityNotFoundException("La proposition de produit n'a pas été trouvée pour ce magasin et ce produit");
