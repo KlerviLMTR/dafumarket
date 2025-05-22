@@ -146,7 +146,13 @@ public class MagasinDAO {
 
         try {
             // 2️⃣ Vérifier que le produit existe
-            Produit produit = produitRepo.getReferenceById(idProduit);
+            Optional<Produit> prod = produitRepo.findById(idProduit);
+            if (prod.isPresent()) {
+                Produit produitTrouve = prod.get();
+            }
+            else{
+                throw new NoSuchElementException("Produit non trouvé");
+            }
 
             // 3️⃣ Charger la proposition éventuelle
             Optional<Proposition> propOpt = propositionRepo

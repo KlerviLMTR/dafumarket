@@ -24,7 +24,11 @@ public class CommandeDAO {
     }
 
     public Commande getCommandeDbByID(int idCommande){
-        return commandeRepo.getReferenceById((long) idCommande);
+        Optional<Commande> c = commandeRepo.findById((long) idCommande);
+        if (c.isPresent()) {
+            return c.get();
+        }
+        return null;
     }
 
     /**

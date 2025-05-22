@@ -7,6 +7,7 @@ import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
+import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
@@ -104,14 +105,10 @@ public class ClientService {
 
         }
 
-
     }
 
 
-
-
-    
-    
-    
-
+    public Client getClient(long idClient) {
+        return this.clientDao.getClient(idClient);
+    }
 }
