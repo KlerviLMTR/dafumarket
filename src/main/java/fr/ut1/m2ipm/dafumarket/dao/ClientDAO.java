@@ -1,7 +1,9 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
 
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
@@ -13,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,16 +26,24 @@ public class ClientDAO {
     private final ClientRepository clientRepository;
     private final PanierRepository panierRepository;
     private final PanierMapper panierMapper;
+    private final CommandeMapper commandeMapper;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
+        this.commandeMapper = commandeMapper;
     }
 
 
-    public List<Commande> getAllCommandesByIdClient(long idClient){
-        return this.clientRepository.findCommandesByClientId(idClient);
+    public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
+
+        List<Commande>  commandes = this.clientRepository.findCommandesByClientId(idClient);
+        ArrayList<CommandeDTO> commandesDTO = new ArrayList<>();
+        for (Commande commande: commandes) {
+            commandesDTO.add(this.commandeMapper.toDto(commande));
+        }
+        return commandesDTO;
     }
 
     public Optional<PanierDTO> getActivePanierByIdClient(long idClient) {

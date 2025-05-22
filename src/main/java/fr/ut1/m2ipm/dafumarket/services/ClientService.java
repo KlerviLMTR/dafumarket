@@ -3,7 +3,9 @@ package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
@@ -30,7 +32,8 @@ public class ClientService {
         this.panierMapper = panierMapper;
     }
 
-    public List<Commande> getAllCommandesByIdClient(long idClient){
+    public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
+
         return this.clientDao.getAllCommandesByIdClient(idClient);
     }
 
@@ -46,16 +49,15 @@ public class ClientService {
         if (!optPanier.isPresent()) {
             // 1.bis Alors il faut creer le panier
             panierEntity =this.clientDao.createPanier(idClient);
-            System.out.println("PANIER CREE : "+ panierEntity);
+           // System.out.println("PANIER CREE : "+ panierEntity);
         }
         else {
             panierEntity = optPanier.get();
-            System.out.println("PANIER PRESENT : "+ panierEntity);
         }
         // 2. Verifier que le produit est bien propose par le magasin
         Proposition proposition = this.magasinDao.getProduitProposeDbMagasinById(idMagasin, idProduit);
         if (proposition != null) {
-            System.out.println("La proposition existe bien :"+ proposition);
+          //  System.out.println("La proposition existe bien :"+ proposition);
             //3. L'ajouter
         }else{
             throw new EntityNotFoundException("La proposition de produit n'a pas été trouvée pour ce magasin et ce produit");
@@ -108,29 +110,6 @@ public class ClientService {
 
 
 
-//    public Panier createOrGetActivePanier(long idClient){
-//        Optional<Panier> p = getActivePanierByIdClient(idClient);
-//        if(p.isPresent()){
-//            return p.get();
-//        }
-//        else{
-//
-//            return this.clientDao.createPanier( idClient);
-//
-//        }
-//    }
-
-
-//
-//    public Panier ajouterProduitAuPanier(long idClient, int idProduit, int quantite, int idMagasin) {
-//        if (quantite <= 0) {
-//            throw new IllegalArgumentException("La quantité doit être supérieure à zéro.");
-//        }
-//
-//
-//    }
-    
-    
     
     
     

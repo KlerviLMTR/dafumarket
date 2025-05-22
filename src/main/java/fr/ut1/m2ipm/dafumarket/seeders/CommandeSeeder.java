@@ -6,6 +6,8 @@ import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.repositories.CommandeRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
 
+import java.time.LocalDateTime;
+
 public class CommandeSeeder {
 
     /**
@@ -23,7 +25,7 @@ public class CommandeSeeder {
             System.out.println("Panier ID=1 introuvable, impossible de créer la commande.");
             return;
         }
-        Commande commande = new Commande(null, panier , CommandeStatut.PAYE);
+        Commande commande = new Commande(null, panier , CommandeStatut.PAYE, LocalDateTime.now().plusWeeks(2));
 
         commandeRepo.save(commande);
 
