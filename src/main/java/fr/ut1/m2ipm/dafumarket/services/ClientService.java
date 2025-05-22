@@ -15,6 +15,7 @@ import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,21 +126,39 @@ public class ClientService {
         //2) si le panier existe, itérer sur les lignes et compter les totaux de produits
         if(panier.isPresent()) {
             PanierDTO panierDTO = panier.get();
-            this.verifierStockMagasinPourUnPanier(panierDTO);
+            HashMap<String, Integer> resultatsVerif = this.verifierStockMagasinPourUnPanier(panierDTO);
+            boolean stocksOk = resultatsVerif.get("nbProduitsCommandables").intValue() == resultatsVerif.get("nbProduitsVoulus").intValue();
 
+            System.out.println( resultatsVerif.get("nbProduitsCommandables"));
+            System.out.println(resultatsVerif.get("nbProduitsVoulus"));
+            System.out.println(stocksOk);
+            if (stocksOk){
+                // Cas ideal : les stocks sont adéquats, on renvoie au client un message pour demander de confirmer la commande et le créneau
+                return new MessagePanier(true,"Toutes les lignes de produit sont en stock. Veuillez confirmer le panier pour ce magasin.", resultatsVerif.get("nbProduitsCommandables"), resultatsVerif.get("nbProduitsVoulus"), resultatsVerif.get("nblignesConformes").intValue() );
+            }
+            else{
+                // Calculer les possibilités dans les autres magasins
+
+            }
         }
-        return new MessagePanier(false, "Test");
+        return new MessagePanier(false, "Test", 0,0,0);
     }
 
 
-    private boolean verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
+    /**
+     * Verifie les stocks du magasin correspondant au panier pour chaque ligne de produit
+     * @param panierDTO
+     * @return
+     */
+    private HashMap<String,Integer> verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
+        int nombreDeProduitsVoulus = 0;
+        int nombreDeProduitsVoulusEnStock = 0;
         int nombresDeMatchs = 0;
-        int nombreDeMatchsNecessaires = panierDTO.getLignes().size();
 
         for (LignePanierDTO lignePanier: panierDTO.getLignes()){
             //Compter ce que veut le client
             int quantiteVoulue = lignePanier.getQuantite();
-
+            nombreDeProduitsVoulus += quantiteVoulue;
             // Recuperer le magasin et l'id produit pour vérifier la proposition associée et son stock
             int idMagasin = lignePanier.getIdMagasin();
             int idProduit = lignePanier.getIdProduit();
@@ -149,6 +168,7 @@ public class ClientService {
                 int stockMagasin = optProposition.get().getStock();
                 if (stockMagasin > quantiteVoulue) {
                     nombresDeMatchs++;
+                    nombreDeProduitsVoulusEnStock += quantiteVoulue;
                 }
 
             }
@@ -158,10 +178,15 @@ public class ClientService {
 
         }
         System.out.println("NombresDeMatchs : " + nombresDeMatchs);
-        System.out.println("NombreDeMatchsNecessaires: " + nombreDeMatchsNecessaires);
-        return nombresDeMatchs == nombreDeMatchsNecessaires;
+        HashMap<String,Integer> resultat = new HashMap<>();
+        resultat.put("nbProduitsCommandables", nombreDeProduitsVoulusEnStock);
+        resultat.put("nbProduitsVoulus", nombreDeProduitsVoulus);
+        resultat.put("nblignesConformes",nombresDeMatchs);
+        return resultat;
 
     }
+
+
 
 
 }
