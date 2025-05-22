@@ -53,6 +53,12 @@ public class ClientController {
 
     }
 
+    @PostMapping("/{idClient}/{commandeId}")
+    public void sendRecapitulatif(@PathVariable long idClient, @PathVariable long commandeId) {
+        this.clientService.sendRecapitulatif(idClient, commandeId);
+    }
+
+
 //    @PostMapping("/{idClient}/paniers")
 //    public Panier createPanier(@PathVariable long idClient) {
 //        return this.clientService.createOrGetActivePanier(idClient);
