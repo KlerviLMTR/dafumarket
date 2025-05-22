@@ -74,6 +74,10 @@ public class ClientDAO {
         return panier;
     }
 
+    //récupérer les informations clients
+    public Client getClientById(long idClient) {
+        return clientRepository.findById(idClient)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé"));
 
     @Transactional
     public Client getClient(long idClient) {
