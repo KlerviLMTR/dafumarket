@@ -78,6 +78,7 @@ public class ClientDAO {
     public Client getClientById(long idClient) {
         return clientRepository.findById(idClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+    }
 
     @Transactional
     public Client getClient(long idClient) {
