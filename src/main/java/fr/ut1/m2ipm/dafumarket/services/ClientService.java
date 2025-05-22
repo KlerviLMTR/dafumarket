@@ -3,8 +3,8 @@ package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
-import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
-import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.dao.PropositionProduitDAO;
+import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
@@ -25,12 +25,14 @@ public class ClientService {
     private final MagasinDAO magasinDao ;
     private final PanierDAO panierDao ;
     private final PanierMapper panierMapper ;
+    private final PropositionProduitDAO propositionDAO ;
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
         this.panierMapper = panierMapper;
+        this.propositionDAO = propositionDAO;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -111,4 +113,55 @@ public class ClientService {
     public Client getClient(long idClient) {
         return this.clientDao.getClient(idClient);
     }
+
+    /**
+     * Verifie le contenu du panier et si le magasin est en capacité de répondre à toute la demande.
+     * @param idClient
+     * @return
+     */
+    public MessagePanier verifierPanier(long idClient) {
+        // 1)  Recuperer le panier DTO du client
+        Optional<PanierDTO> panier = this.clientDao.getActivePanierByIdClient(idClient);
+        //2) si le panier existe, itérer sur les lignes et compter les totaux de produits
+        if(panier.isPresent()) {
+            PanierDTO panierDTO = panier.get();
+            this.verifierStockMagasinPourUnPanier(panierDTO);
+
+        }
+        return new MessagePanier(false, "Test");
+    }
+
+
+    private boolean verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
+        int nombresDeMatchs = 0;
+        int nombreDeMatchsNecessaires = panierDTO.getLignes().size();
+
+        for (LignePanierDTO lignePanier: panierDTO.getLignes()){
+            //Compter ce que veut le client
+            int quantiteVoulue = lignePanier.getQuantite();
+
+            // Recuperer le magasin et l'id produit pour vérifier la proposition associée et son stock
+            int idMagasin = lignePanier.getIdMagasin();
+            int idProduit = lignePanier.getIdProduit();
+            // Recuperer la propal
+            Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
+            if (optProposition.isPresent()) {
+                int stockMagasin = optProposition.get().getStock();
+                if (stockMagasin > quantiteVoulue) {
+                    nombresDeMatchs++;
+                }
+
+            }
+            else{
+                throw new EntityNotFoundException("La proposition de produit n'est pas dans le catalogue du magasin! ");
+            }
+
+        }
+        System.out.println("NombresDeMatchs : " + nombresDeMatchs);
+        System.out.println("NombreDeMatchsNecessaires: " + nombreDeMatchsNecessaires);
+        return nombresDeMatchs == nombreDeMatchsNecessaires;
+
+    }
+
+
 }

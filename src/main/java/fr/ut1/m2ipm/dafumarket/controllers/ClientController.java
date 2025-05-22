@@ -1,6 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
+import fr.ut1.m2ipm.dafumarket.dto.MessagePanier;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 
@@ -57,8 +58,14 @@ public class ClientController {
         else{
             return ResponseEntity.noContent().build();
         }
-
     }
+
+    @PostMapping("/{idClient}/commande")
+    public ResponseEntity<MessagePanier> verifierPanier(@PathVariable long idClient){
+        MessagePanier m = this.clientService.verifierPanier(idClient);
+        return  ResponseEntity.ok(m);
+    }
+
 
 
 
