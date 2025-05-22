@@ -3,12 +3,12 @@ package fr.ut1.m2ipm.dafumarket.dao;
 
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.Compte;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.repositories.ClientRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +23,12 @@ public class ClientDAO {
         this.panierRepository = panierRepository;
     }
 
+    public Client getClientByCompte(Compte compte) {
+        Optional<Client> client = clientRepository.findByCompte(compte);
+        return client.orElse(null);
+    }
 
-    public List<Commande> getAllCommandesByIdClient(long idClient){
+    public List<Commande> getAllCommandesByIdClient(long idClient) {
         return this.clientRepository.findCommandesByClientId(idClient);
     }
 
@@ -32,7 +36,7 @@ public class ClientDAO {
         return this.clientRepository.getActivePanierByIdClient(idClient);
     }
 
-    public Panier createPanier( long idClient) {
+    public Panier createPanier(long idClient) {
         Client client = clientRepository.findById(idClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé"));
 
