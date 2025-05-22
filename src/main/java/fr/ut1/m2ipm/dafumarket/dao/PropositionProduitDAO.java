@@ -53,5 +53,10 @@ public class PropositionProduitDAO {
         return this.propositionRepository.findByProduit_IdProduitAndMagasin_IdMagasin(id_Produit, id_Magasin);
     }
 
+    public void modifierStockProposition(Proposition proposition, int stock) {
+        proposition.setStock(stock);
+        this.propositionRepository.save(proposition);
+    }
+
 
 }

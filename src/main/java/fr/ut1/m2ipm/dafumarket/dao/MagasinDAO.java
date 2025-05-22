@@ -1,11 +1,14 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ProduitMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ProduitProposeMapper;
+import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.Promotion;
@@ -14,7 +17,12 @@ import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MagasinDAO {
@@ -24,13 +32,17 @@ public class MagasinDAO {
     private final PropositionProduitDAO propositionDAO;
     private final AssocierPromoRepository associerPromoRepository;
     private final ProduitRepository produitRepo;
+    private final CommandeRepository commandeRepo;
+    private final CommandeMapper commandeMapper;
 
-    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo) {
+    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper) {
         this.magasinRepo = magasinRepo;
         this.propositionRepo = propositionRepo;
         this.propositionDAO = propositionDAO;
         this.associerPromoRepository = associerPromoRepository;
         this.produitRepo = produitRepo;
+        this.commandeRepo = commandeRepo;
+        this.commandeMapper = commandeMapper;
 
     }
 
@@ -134,7 +146,13 @@ public class MagasinDAO {
 
         try {
             // 2️⃣ Vérifier que le produit existe
-            Produit produit = produitRepo.getReferenceById(idProduit);
+            Optional<Produit> prod = produitRepo.findById(idProduit);
+            if (prod.isPresent()) {
+                Produit produitTrouve = prod.get();
+            }
+            else{
+                throw new NoSuchElementException("Produit non trouvé");
+            }
 
             // 3️⃣ Charger la proposition éventuelle
             Optional<Proposition> propOpt = propositionRepo
@@ -153,5 +171,29 @@ public class MagasinDAO {
             // Le produit avec cet id n'existe pas
             return Optional.empty();
         }
+    }
+
+    public Proposition getProduitProposeDbMagasinById(int idMagasin, int idProduit) {
+        Magasin magasin = magasinRepo.findById(idMagasin)
+                .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        Produit produit = produitRepo.getReferenceById(idProduit);
+        Optional<Proposition> propOpt = propositionRepo
+                .findByProduit_IdProduitAndMagasin_IdMagasin(idProduit, idMagasin);
+        return propOpt.orElse(null);
+
+    }
+
+
+    public List<CommandeDTO> getAllCommandesAPreparer() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end   = today.atTime(LocalTime.MAX);
+
+        List<Commande> commandes =
+                commandeRepo.findByDateHeureRetraitBetween(start, end);
+
+        return commandes.stream()
+                .map(commandeMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
