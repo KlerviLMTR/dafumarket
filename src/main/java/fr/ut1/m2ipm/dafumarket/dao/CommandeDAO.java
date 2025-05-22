@@ -1,5 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.CommandeStatut;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
@@ -12,15 +14,19 @@ import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class CommandeDAO {
     private final CommandeRepository commandeRepo;
+    private final CommandeMapper commandeMapper;
 
 
-    public CommandeDAO(CommandeRepository commandeRepo) {
+    public CommandeDAO(CommandeRepository commandeRepo, CommandeMapper commandeMapper) {
        this.commandeRepo = commandeRepo;
+       this.commandeMapper = commandeMapper;
     }
 
     public Commande getCommandeDbByID(int idCommande){
@@ -45,6 +51,14 @@ public class CommandeDAO {
     }
 
 
-
+    public List<CommandeDTO> getAllCommandes() {
+        List<Commande> commandes =  this.commandeRepo.findAll();
+        List<CommandeDTO> commandeDTOs = new ArrayList<>();
+        for (Commande commande: commandes) {
+            this.commandeMapper.toDto(commande);
+            commandeDTOs.add(commandeMapper.toDto(commande));
+        }
+        return commandeDTOs;
+    }
 
 }
