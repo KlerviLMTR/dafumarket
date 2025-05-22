@@ -9,6 +9,7 @@ import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.repositories.ClientRepository;
+import fr.ut1.m2ipm.dafumarket.repositories.CommandeRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -27,12 +28,14 @@ public class ClientDAO {
     private final PanierRepository panierRepository;
     private final PanierMapper panierMapper;
     private final CommandeMapper commandeMapper;
+    private final CommandeRepository commandeRepository;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
         this.commandeMapper = commandeMapper;
+        this.commandeRepository = commandeRepository;
     }
 
 
@@ -75,6 +78,17 @@ public class ClientDAO {
     public Client getClientById(long idClient) {
         return clientRepository.findById(idClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+
+    @Transactional
+    public Client getClient(long idClient) {
+
+        Optional<Client> c = this.clientRepository.findById(idClient);
+        if (c.isPresent()) {
+            return c.get();
+        }
+        else{
+            return null;
+        }
     }
 }
 

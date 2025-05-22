@@ -136,7 +136,6 @@ public class ClientService {
 
         }
 
-
     }
 
     public void sendRecapitulatif(long idClient, long commandeId) {
@@ -357,9 +356,8 @@ public class ClientService {
         table.addCell(cell);
     }
 
-
-    
-    
-    
+    public Client getClient(long idClient) {
+        return this.clientDao.getClient(idClient);
+    }
 
 }

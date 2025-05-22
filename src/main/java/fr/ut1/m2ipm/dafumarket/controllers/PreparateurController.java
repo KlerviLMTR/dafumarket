@@ -23,9 +23,14 @@ public class PreparateurController {
     }
 
     @GetMapping("/commandes")
-    public List<CommandeDTO> getAllCommandesAPreparer() {
+    public List<CommandeDTO> getAllCommandesAPreparer(@RequestParam (value= "dueDate",required = false) Boolean dueDate) {
 
-        return this.magasinService.getAllCommandesAPreparer();
+        if(dueDate == null) {
+            return this.magasinService.getAllCommandes();
+        }
+
+         return this.magasinService.getAllCommandesAPreparer();
+
     }
 
     /**
@@ -38,6 +43,11 @@ public class PreparateurController {
     public CommandeDTO prendreEnMainCommande(@PathVariable int idCommande, @RequestParam String statut) {
         return this.magasinService.prendreEnMainCommande(idCommande, statut);
     }
+
+//    @GetMapping("/commandes")
+//    public List<CommandeDTO> getAllCommandes() {
+//        return this.magasinService.getAllCommandes();
+//    }
 
 
 
