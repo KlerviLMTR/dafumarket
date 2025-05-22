@@ -22,7 +22,7 @@ public class PanierDAO {
 
     }
 
-    public Optional<Panier> getPanierById(int id) {
+    public Optional<Panier> getPanierById(Long id) {
         return this.panierRepository.findById((long) id);
     }
 

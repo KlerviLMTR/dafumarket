@@ -15,6 +15,7 @@ import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -155,12 +156,14 @@ public class ClientService {
         int nombreDeProduitsVoulusEnStock = 0;
         int nombresDeMatchs = 0;
 
+        // Recuperer l'id du magasin associé au panier
+        int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
+
         for (LignePanierDTO lignePanier: panierDTO.getLignes()){
             //Compter ce que veut le client
             int quantiteVoulue = lignePanier.getQuantite();
             nombreDeProduitsVoulus += quantiteVoulue;
             // Recuperer le magasin et l'id produit pour vérifier la proposition associée et son stock
-            int idMagasin = lignePanier.getIdMagasin();
             int idProduit = lignePanier.getIdProduit();
             // Recuperer la propal
             Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
@@ -172,9 +175,6 @@ public class ClientService {
                 }
 
             }
-            else{
-                throw new EntityNotFoundException("La proposition de produit n'est pas dans le catalogue du magasin! ");
-            }
 
         }
         System.out.println("NombresDeMatchs : " + nombresDeMatchs);
@@ -183,10 +183,69 @@ public class ClientService {
         resultat.put("nbProduitsVoulus", nombreDeProduitsVoulus);
         resultat.put("nblignesConformes",nombresDeMatchs);
         return resultat;
-
     }
 
 
+    /**
+     * Confirme la commande:
+     * - Mettre à jour le panier avec les stocks réellement disponibles en magasin
+     * - Cree la commande associée au panier avec le bon créneau horaire
+     * @param idClient
+     */
+    public void confirmerCommande(long idClient, OffsetDateTime creneau) {
+        // 1. Récuperer le panier en cours
+        Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
+        if(panierDb.isPresent()) {
+            Panier panier = panierDb.get();
+           this.mettreAJourLePanierAvecStocksDisponibles(panier);
 
 
+
+        }
+        else{
+            throw new EntityNotFoundException("La panier du client n'existe pas !");
+        }
+    }
+
+    private void mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
+        PanierDTO panierDTO = this.panierMapper.toDto(panierDb);
+        int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
+
+        for(AppartenirPanier lignePanier: panierDb.getLignes()){
+            int idProduit = lignePanier.getProposition().getProduit().getIdProduit();
+
+            Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
+            if (optProposition.isPresent()) {
+                Proposition proposition = optProposition.get();
+                int stock = proposition.getStock();
+                int quantiteVoulue = lignePanier.getQuantite();
+
+                System.out.println("Stock : " + stock);
+                System.out.println("Quantite voulue: " + quantiteVoulue);
+
+                if(stock >= quantiteVoulue) {
+                    // Alors on décrémente le stock de la quantité et on ne touche pas à la quantité commandée
+                    stock = stock - quantiteVoulue;
+                }
+                else{
+                    // Alors on met à jour la quantité de la ligne avec le stock restant et le stock tombe à 0
+                    quantiteVoulue = stock;
+                    stock = 0;
+                }
+                System.out.println("Nouveau stock : " + stock);
+                System.out.println("Nouvelle quantite : " + quantiteVoulue);
+                // TODO Et après tout mettre à jour. Va aussi falloir traiter le cas où le stock est à 0
+
+//                int stockMagasin = optProposition.get().getStock();
+//
+//                int quantiteVoulue = lignePanier.getQuantite();
+
+
+            }
+            else{
+               //int quantiteMiseAJour = lignePanier.
+            }
+
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ConfirmationPanierRequest;
 import fr.ut1.m2ipm.dafumarket.dto.MessagePanier;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
@@ -9,6 +11,8 @@ import fr.ut1.m2ipm.dafumarket.services.ClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,13 +64,26 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/{idClient}/commande")
+    @PostMapping("/{idClient}/verificationPanier")
     public ResponseEntity<MessagePanier> verifierPanier(@PathVariable long idClient){
         MessagePanier m = this.clientService.verifierPanier(idClient);
         return  ResponseEntity.ok(m);
     }
 
+    @PostMapping("/{idClient}/confirmationPanier")
+    public ResponseEntity<OffsetDateTime> confirmerCommande(
+            @PathVariable long idClient,
+            @RequestBody ConfirmationPanierRequest body
+    ) {
+        OffsetDateTime creneau = body.getCreneauHoraire();
+        if (creneau!=null){
+            this.clientService.confirmerCommande(idClient, creneau);
+            return ResponseEntity.ok(creneau);
+        }
+        else{
+            return ResponseEntity.badRequest().build();
 
-
+        }
+    }
 
 }
