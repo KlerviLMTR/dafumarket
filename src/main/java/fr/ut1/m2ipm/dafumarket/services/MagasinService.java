@@ -85,4 +85,7 @@ public class MagasinService {
     }
 
 
+    public List<CommandeDTO> getAllCommandes() {
+        return this.commandeDAO.getAllCommandes();
+    }
 }

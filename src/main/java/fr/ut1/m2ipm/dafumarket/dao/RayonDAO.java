@@ -8,6 +8,7 @@ import fr.ut1.m2ipm.dafumarket.repositories.RayonRepository;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class RayonDAO {
@@ -40,8 +41,8 @@ public class RayonDAO {
      * @return RayonDTO
      */
     public RayonDTO getRayonById(int id) {
-        Rayon rayon = rayonRepository.getReferenceById(id);
-        return RayonMapper.toDto(rayon);
+        Optional<Rayon> rayon = rayonRepository.findById(id);
+        return rayon.map(RayonMapper::toDto).orElse(null);
     }
 }
 
