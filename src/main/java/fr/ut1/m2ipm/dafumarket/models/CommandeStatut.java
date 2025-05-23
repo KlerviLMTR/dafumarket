@@ -3,7 +3,7 @@ package fr.ut1.m2ipm.dafumarket.models;
 
 public enum CommandeStatut {
     PAYE,
-    EN_ATTENTE_DE_PREPARATION,
+    A_PREPARER,
     EN_PREPARATION,
     PRET,
     RECEPTIONNE

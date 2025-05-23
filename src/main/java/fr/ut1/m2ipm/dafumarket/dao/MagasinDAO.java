@@ -1,11 +1,14 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
+import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
+import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ProduitMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ProduitProposeMapper;
+import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.Promotion;
@@ -16,7 +19,12 @@ import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MagasinDAO {
@@ -26,15 +34,20 @@ public class MagasinDAO {
     private final PropositionProduitDAO propositionDAO;
     private final AssocierPromoRepository associerPromoRepository;
     private final ProduitRepository produitRepo;
+    private final CommandeRepository commandeRepo;
+    private final CommandeMapper commandeMapper;
     private final RayonRepository rayonRepo;
 
-    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, RayonRepository rayonRepo) {
+    public MagasinDAO(MagasinRepository magasinRepo,
+                      PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper, RayonRepository rayonRepo) {
         this.magasinRepo = magasinRepo;
         this.propositionRepo = propositionRepo;
         this.propositionDAO = propositionDAO;
         this.associerPromoRepository = associerPromoRepository;
         this.produitRepo = produitRepo;
         this.rayonRepo = rayonRepo;
+        this.commandeRepo = commandeRepo;
+        this.commandeMapper = commandeMapper;
 
     }
 
@@ -64,7 +77,6 @@ public class MagasinDAO {
 
     /**
      * Recupere les infos pour un magasin d'id donné
-     *
      * @param id
      * @return MagasinDTO
      */
@@ -165,6 +177,7 @@ public class MagasinDAO {
     }
 
 
+
     public Optional<ProduitProposeDTO> getProduitProposeMagasinById(int idMagasin, int idProduit) {
         // 1️⃣ Vérifier que le magasin existe
         Magasin magasin = magasinRepo.findById(idMagasin)
@@ -172,7 +185,13 @@ public class MagasinDAO {
 
         try {
             // 2️⃣ Vérifier que le produit existe
-            Produit produit = produitRepo.getReferenceById(idProduit);
+            Optional<Produit> prod = produitRepo.findById(idProduit);
+            if (prod.isPresent()) {
+                Produit produitTrouve = prod.get();
+            }
+            else{
+                throw new NoSuchElementException("Produit non trouvé");
+            }
 
             // 3️⃣ Charger la proposition éventuelle
             Optional<Proposition> propOpt = propositionRepo
@@ -204,4 +223,16 @@ public class MagasinDAO {
     }
 
 
+    public List<CommandeDTO> getAllCommandesAPreparer() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end   = today.atTime(LocalTime.MAX);
+
+        List<Commande> commandes =
+                commandeRepo.findByDateHeureRetraitBetween(start, end);
+
+        return commandes.stream()
+                .map(commandeMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }
