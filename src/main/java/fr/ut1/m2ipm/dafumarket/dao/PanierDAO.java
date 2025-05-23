@@ -46,16 +46,14 @@ public class PanierDAO {
         System.out.println("Ligne ajoutée !");
     }
     @Transactional
-    public void supprimerLigneDuPanier(AppartenirPanier appartenirPanier){
-
-        this.appartenirPanierRepository.delete(appartenirPanier);
-        System.out.println("Ligne supprimée!");
+    public void supprimerLigneDuPanier(AppartenirPanier appartenirPanier, Panier panierDb){
+        panierDb.getLignes().remove(appartenirPanier);
     }
     @Transactional
     public void miseAJourQuantiteLignePanier(AppartenirPanier ligne, int quantite ){
         ligne.setQuantite(quantite);
         appartenirPanierRepository.save(ligne);
-        System.out.println("quantité ligne mise à jour !");
+                System.out.println("quantité ligne mise à jour !");
     }
     @Transactional
     public void supprimerPanier(Panier panier){

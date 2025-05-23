@@ -64,21 +64,21 @@ public class ClientController {
         }
     }
 
-    @PostMapping("/{idClient}/verificationPanier")
+    @GetMapping("/{idClient}/verificationPanier")
     public ResponseEntity<MessagePanier> verifierPanier(@PathVariable long idClient){
         MessagePanier m = this.clientService.verifierPanier(idClient);
         return  ResponseEntity.ok(m);
     }
 
-    @PostMapping("/{idClient}/confirmationPanier")
-    public ResponseEntity<OffsetDateTime> confirmerCommande(
+    @PostMapping("/{idClient}/confirmationCommande")
+    public ResponseEntity<PanierDTO> confirmerCommande(
             @PathVariable long idClient,
             @RequestBody ConfirmationPanierRequest body
     ) {
         OffsetDateTime creneau = body.getCreneauHoraire();
         if (creneau!=null){
-            this.clientService.confirmerCommande(idClient, creneau);
-            return ResponseEntity.ok(creneau);
+            PanierDTO p = this.clientService.confirmerCommande(idClient, creneau);
+            return ResponseEntity.ok(p);
         }
         else{
             return ResponseEntity.badRequest().build();

@@ -13,10 +13,13 @@ import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Transient;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,9 +97,8 @@ public class ClientService {
             // Logique métier ici :
 
             if (quantite <= 0) {
-                panier.getLignes().remove(lignePanier);
 
-                this.panierDao.supprimerLigneDuPanier(lignePanier);
+                this.panierDao.supprimerLigneDuPanier(lignePanier, panier);
             } else {
                this.panierDao.miseAJourQuantiteLignePanier(lignePanier, quantite);
             }
@@ -117,7 +119,7 @@ public class ClientService {
     }
 
     /**
-     * Verifie le contenu du panier et si le magasin est en capacité de répondre à toute la demande.
+     * Verifie le contenu du panier et si le magasin est en capacité de répondre à toute la demande. (étape 1/2 de la confirmation du magasin)
      * @param idClient
      * @return
      */
@@ -125,6 +127,7 @@ public class ClientService {
         // 1)  Recuperer le panier DTO du client
         Optional<PanierDTO> panier = this.clientDao.getActivePanierByIdClient(idClient);
         //2) si le panier existe, itérer sur les lignes et compter les totaux de produits
+
         if(panier.isPresent()) {
             PanierDTO panierDTO = panier.get();
             HashMap<String, Integer> resultatsVerif = this.verifierStockMagasinPourUnPanier(panierDTO);
@@ -138,16 +141,17 @@ public class ClientService {
                 return new MessagePanier(true,"Toutes les lignes de produit sont en stock. Veuillez confirmer le panier pour ce magasin.", resultatsVerif.get("nbProduitsCommandables"), resultatsVerif.get("nbProduitsVoulus"), resultatsVerif.get("nblignesConformes").intValue() );
             }
             else{
+                return new MessagePanier(false, "Certains produits ne sont pas disponibles. Vous pouvez choisir de poursuivre avec ce magasin ou en sélectionner un autre", resultatsVerif.get("nbProduitsVoulus").intValue(), resultatsVerif.get("nbProduitsCommandables"),resultatsVerif.get("nblignesConformes").intValue());
                 // Calculer les possibilités dans les autres magasins
 
             }
         }
-        return new MessagePanier(false, "Test", 0,0,0);
+        return null;
     }
 
 
     /**
-     * Verifie les stocks du magasin correspondant au panier pour chaque ligne de produit
+     * Verifie les stocks du magasin correspondant au panier pour chaque ligne de produit (étape 1/2 de la confirmation du magasin)
      * @param panierDTO
      * @return
      */
@@ -155,6 +159,7 @@ public class ClientService {
         int nombreDeProduitsVoulus = 0;
         int nombreDeProduitsVoulusEnStock = 0;
         int nombresDeMatchs = 0;
+
 
         // Recuperer l'id du magasin associé au panier
         int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
@@ -187,19 +192,17 @@ public class ClientService {
 
 
     /**
-     * Confirme la commande:
+     * Confirme la commande: (étape 2/2 de la confirmation du magasin)
      * - Mettre à jour le panier avec les stocks réellement disponibles en magasin
      * - Cree la commande associée au panier avec le bon créneau horaire
      * @param idClient
      */
-    public void confirmerCommande(long idClient, OffsetDateTime creneau) {
+    public PanierDTO confirmerCommande(long idClient, OffsetDateTime creneau) {
         // 1. Récuperer le panier en cours
         Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
         if(panierDb.isPresent()) {
             Panier panier = panierDb.get();
-           this.mettreAJourLePanierAvecStocksDisponibles(panier);
-
-
+            return this.mettreAJourLePanierAvecStocksDisponibles(panier);
 
         }
         else{
@@ -207,11 +210,21 @@ public class ClientService {
         }
     }
 
-    private void mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
+    /**
+     * Parcourt tout le panier. Pour chaque ligne, vérifie s'il y a du stock (étape 2/2 de la confirmation du magasin)
+     * - Si aucun stock --> La ligne est supprimée du panier final
+     * - Si stock > quantite, alors quantité inchangée et stock = stock - quantite
+     * - Si stock < quantite mais stock >0 , quantite = stock et stock = 0
+     * @param panierDb
+     */
+    private PanierDTO mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
         PanierDTO panierDTO = this.panierMapper.toDto(panierDb);
         int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
 
-        for(AppartenirPanier lignePanier: panierDb.getLignes()){
+        Iterator<AppartenirPanier> it = panierDb.getLignes().iterator();
+        while (it.hasNext()) {
+
+            AppartenirPanier lignePanier = it.next();
             int idProduit = lignePanier.getProposition().getProduit().getIdProduit();
 
             Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
@@ -226,26 +239,25 @@ public class ClientService {
                 if(stock >= quantiteVoulue) {
                     // Alors on décrémente le stock de la quantité et on ne touche pas à la quantité commandée
                     stock = stock - quantiteVoulue;
+                    this.panierDao.miseAJourQuantiteLignePanier(lignePanier, quantiteVoulue);
+                    this.propositionDAO.modifierStockProposition(proposition, stock);
                 }
-                else{
+                else if(stock == 0){
+                    // Dans ce cas pas possible d'avoir l'item commandé donc on supprime la ligne panier correspondante
+                    String ligne = "idProduit:"+lignePanier.getProposition().getProduit().getIdProduit()+", idMagasin:"+idMagasin + ", idPanier:"+panierDb.getIdPanier();
+                    System.out.println("La ligne "+ lignePanier.getProposition().getProduit().getNom() + " ne peut être commandée car le stock est à 0");
+                    this.panierDao.supprimerLigneDuPanier(lignePanier, panierDb);
+                    it.remove();
+                }
+                else {
                     // Alors on met à jour la quantité de la ligne avec le stock restant et le stock tombe à 0
                     quantiteVoulue = stock;
                     stock = 0;
+                    this.panierDao.miseAJourQuantiteLignePanier(lignePanier, quantiteVoulue);
+                    this.propositionDAO.modifierStockProposition(proposition, stock);
                 }
-                System.out.println("Nouveau stock : " + stock);
-                System.out.println("Nouvelle quantite : " + quantiteVoulue);
-                // TODO Et après tout mettre à jour. Va aussi falloir traiter le cas où le stock est à 0
-
-//                int stockMagasin = optProposition.get().getStock();
-//
-//                int quantiteVoulue = lignePanier.getQuantite();
-
-
             }
-            else{
-               //int quantiteMiseAJour = lignePanier.
-            }
-
         }
+        return this.panierMapper.toDto(panierDb);
     }
 }
