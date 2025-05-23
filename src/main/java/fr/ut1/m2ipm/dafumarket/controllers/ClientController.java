@@ -71,13 +71,13 @@ public class ClientController {
     }
 
     @PostMapping("/{idClient}/confirmationCommande")
-    public ResponseEntity<PanierDTO> confirmerCommande(
+    public ResponseEntity<CommandeDTO> confirmerCommande(
             @PathVariable long idClient,
             @RequestBody ConfirmationPanierRequest body
     ) {
         OffsetDateTime creneau = body.getCreneauHoraire();
         if (creneau!=null){
-            PanierDTO p = this.clientService.confirmerCommande(idClient, creneau);
+            CommandeDTO p = this.clientService.confirmerCommande(idClient, creneau);
             return ResponseEntity.ok(p);
         }
         else{

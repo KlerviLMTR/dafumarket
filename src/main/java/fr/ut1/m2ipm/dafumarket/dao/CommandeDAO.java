@@ -14,6 +14,7 @@ import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,15 @@ public class CommandeDAO {
             commandeDTOs.add(commandeMapper.toDto(commande));
         }
         return commandeDTOs;
+    }
+    @Transactional
+    public Commande creerCommande(Panier panier, LocalDateTime creneau) {
+        Commande commande = new Commande();
+        commande.setDateHeureRetrait(creneau);
+        commande.setStatut(CommandeStatut.PAYE);
+        commande.setPanier(panier);
+        this.commandeRepo.save(commande);
+        return commande;
     }
 
 }

@@ -1,9 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.services;
 
-import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PropositionProduitDAO;
+import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
@@ -17,7 +14,9 @@ import jakarta.persistence.Transient;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,13 +30,17 @@ public class ClientService {
     private final PanierDAO panierDao ;
     private final PanierMapper panierMapper ;
     private final PropositionProduitDAO propositionDAO ;
+    private final CommandeDAO commandeDAO ;
+    private final CommandeMapper commandeMapper ;
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO, CommandeDAO commandeDAO, CommandeMapper commandeMapper) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
         this.panierMapper = panierMapper;
         this.propositionDAO = propositionDAO;
+        this.commandeDAO = commandeDAO;
+        this.commandeMapper = commandeMapper;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -197,12 +200,23 @@ public class ClientService {
      * - Cree la commande associée au panier avec le bon créneau horaire
      * @param idClient
      */
-    public PanierDTO confirmerCommande(long idClient, OffsetDateTime creneau) {
+    public CommandeDTO confirmerCommande(long idClient, OffsetDateTime creneau) {
         // 1. Récuperer le panier en cours
         Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
         if(panierDb.isPresent()) {
             Panier panier = panierDb.get();
-            return this.mettreAJourLePanierAvecStocksDisponibles(panier);
+            this.mettreAJourLePanierAvecStocksDisponibles(panier);
+            // Une fois le panier et les stocks à jour, créer l'objet commande qui lui sera associé
+
+
+            LocalDateTime creneauDate = creneau
+                    .atZoneSameInstant(ZoneId.systemDefault())
+                    .toLocalDateTime();
+            Commande c = this.commandeDAO.creerCommande(panier, creneauDate);
+
+            return this.commandeMapper.toDto(c);
+
+
 
         }
         else{
@@ -217,7 +231,7 @@ public class ClientService {
      * - Si stock < quantite mais stock >0 , quantite = stock et stock = 0
      * @param panierDb
      */
-    private PanierDTO mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
+    private Panier mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
         PanierDTO panierDTO = this.panierMapper.toDto(panierDb);
         int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
 
@@ -258,6 +272,12 @@ public class ClientService {
                 }
             }
         }
-        return this.panierMapper.toDto(panierDb);
+        return panierDb;
     }
+
+
+
+
+
+
 }
