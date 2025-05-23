@@ -359,5 +359,12 @@ public class ClientService {
     public Client getClient(long idClient) {
         return this.clientDao.getClient(idClient);
     }
+    public void supprimerPanier(long idClient) {
+        Optional<Panier> optPanier = clientDao.getActivePanierDbByIdClient(idClient);
+        if (optPanier.isPresent()) {
+            Panier panier = optPanier.get();
+            panierDao.supprimerPanier(panier);
+        }
+    }
 
 }

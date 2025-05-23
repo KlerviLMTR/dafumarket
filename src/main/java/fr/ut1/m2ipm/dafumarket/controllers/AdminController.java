@@ -27,7 +27,6 @@ public class AdminController {
             throw new RuntimeException("Le fichier est vide");
         }
 
-        System.out.println("abc");
         return this.propositionService.creerPropositionsProduitsCSV(file,idMagasin);
     }
 
