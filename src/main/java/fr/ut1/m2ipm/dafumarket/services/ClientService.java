@@ -1,5 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
@@ -7,19 +9,14 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
-import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
-import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
-import fr.ut1.m2ipm.dafumarket.dto.LignePanierDTO;
-import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
-import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.dao.*;
+import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
+import fr.ut1.m2ipm.dafumarket.models.PostIt;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.activation.DataSource;
@@ -27,6 +24,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -35,14 +36,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.client.RestTemplate;
 
 
 @Service
@@ -55,8 +58,10 @@ public class ClientService {
     private final CommandeDAO commandeDao;
     private final JavaMailSender mailSender;
     private final CommandeMapper commandeMapper;
+    private final PostItDAO postItDao;
+    private final ProduitService produitService;
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, PostItDAO postItDao, ProduitService produitService) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
@@ -64,6 +69,8 @@ public class ClientService {
         this.commandeDao = commandeDao;
         this.mailSender = mailSender;
         this.commandeMapper = commandeMapper;
+        this.postItDao = postItDao;
+        this.produitService = produitService;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -366,5 +373,241 @@ public class ClientService {
             panierDao.supprimerPanier(panier);
         }
     }
+    //    @GetMapping("/{idClient}/postit/")
+    //    public List<PostIt> getPostItByIdClient(@PathVariable long idClient) {
+    //        return this.clientService.getPostItByIdClient(idClient);
+    //    }
+    // implémenter fonction adéquat
+    public PostIt getPostItById(long idClient, long idPostIt) {
+        return this.postItDao.getPostItById(idClient, idPostIt);
+    }
+
+    public Map<String, List<ProduitDTO>> trouverProduitsSimilaires(List<ProduitDTO> produits, List<String> ingredients) {
+        Map<String, List<ProduitDTO>> resultats = new LinkedHashMap<>();
+
+        for (String ingredient : ingredients) {
+            String[] mots = normaliserTexte(ingredient).split(" ");
+
+            List<ProduitDTO> correspondants = produits.stream()
+                    .filter(p -> contientMotCle(p, mots))
+                    .limit(15) // max 5 suggestions par ingrédient
+                    .collect(Collectors.toList());
+
+            resultats.put(ingredient, correspondants);
+        }
+
+        return resultats;
+    }
+
+    private static final List<String> RAYONS_EXCLUS = List.of("Animalerie", "Bébé", "Hygiène", "Soins bébé");
+
+    private boolean contientMotCle(ProduitDTO produit, String[] motsCles) {
+        String nom = normaliserTexte(produit.getNom());
+
+        for (String mot : motsCles) {
+            if (!nom.contains(mot)) {
+                return false; // Un mot-clé manquant = pas pertinent
+            }
+        }
+
+        return true; // Tous les mots sont présents dans le nom → pertinent
+    }
+
+    private String normaliserTexte(String texte) {
+        if (texte == null) return "";
+        return texte.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "")  // retire accents et ponctuation
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
+    public void testerPremierAppelMistral() {
+        Map<String, Object> resultat = testerAppelMistral("Je veux faire des lasagnes");
+
+        String reponseUtilisateur = (String) resultat.get("reponseUtilisateur");
+        List<String> ingredients = (List<String>) resultat.get("ingredients");
+
+        System.out.println(" Réponse LLM  : " + reponseUtilisateur);
+        System.out.println(" Ingrédients : " + ingredients);
+
+        testerDeuxiemeAppelMistralAvecIngredients(ingredients);
+    }
+
+
+
+    public Map<String, Object> testerAppelMistral(String message) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://api.mistral.ai/v1/agents/completions";
+
+            Map<String, Object> messageMap = Map.of(
+                    "role", "user",
+                    "content", message
+            );
+
+            Map<String, Object> body = Map.of(
+                    "agent_id", "ag:359ab99b:20250522:untitled-agent:0d2e13d1",
+                    "messages", List.of(messageMap)
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth("W4gjIutIAxTtxm3VbjMwDhuZrsgkvs9H");
+
+            HttpEntity<String> request = new HttpEntity<>(new ObjectMapper().writeValueAsString(body), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            return extraireReponseEtIngredients(response.getBody());
+
+        } catch (Exception e) {
+            System.out.println(" Erreur appel Mistral : " + e.getMessage());
+            return Map.of(
+                    "reponseUtilisateur", "Erreur Mistral",
+                    "ingredients", Collections.emptyList()
+            );
+        }
+    }
+
+
+    public Map<String, Object> extraireReponseEtIngredients(String jsonReponseMistral) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            JsonNode racine = mapper.readTree(jsonReponseMistral);
+            String contentJsonString = racine
+                    .path("choices")
+                    .get(0)
+                    .path("message")
+                    .path("content")
+                    .asText();
+
+            JsonNode contentJson = mapper.readTree(contentJsonString);
+            String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
+
+            List<String> ingredients = new ArrayList<>();
+            for (JsonNode node : contentJson.path("ingredients")) {
+                ingredients.add(node.asText());
+            }
+
+            return Map.of(
+                    "reponseUtilisateur", reponseUtilisateur,
+                    "ingredients", ingredients
+            );
+
+        } catch (Exception e) {
+            System.out.println(" Erreur de parsing Mistral : " + e.getMessage());
+            return Map.of(
+                    "reponseUtilisateur", "Erreur parsing",
+                    "ingredients", Collections.emptyList()
+            );
+        }
+    }
+
+    public void testerDeuxiemeAppelMistralAvecIngredients(List<String> ingredients) {
+        if (ingredients.isEmpty()) {
+            System.out.println(" Aucun ingrédient extrait.");
+            return;
+        }
+
+        List<ProduitDTO> tousLesProduits = produitService.getAllProduits();
+        Map<String, List<ProduitDTO>> matches = trouverProduitsSimilaires(tousLesProduits, ingredients);
+
+        List<Map<String, Object>> propositions = new ArrayList<>();
+
+        for (String ingredient : matches.keySet()) {
+            List<Map<String, Object>> produitsFormates = matches.get(ingredient).stream()
+                    .map(p -> Map.<String, Object>of(
+                            "idProduit", p.getIdProduit(),
+                            "nom", p.getNom()
+                    ))
+                    .collect(Collectors.toList());
+
+            if (!produitsFormates.isEmpty()) {
+                Map<String, Object> proposition = new HashMap<>();
+                proposition.put("ingredient", ingredient);
+                proposition.put("produitsProposes", produitsFormates);
+                propositions.add(proposition);
+            } else {
+                System.out.println("Aucun produit trouvé pour : " + ingredient);
+            }
+        }
+
+
+        Map<String, Object> jsonEnvoye = Map.of("propositions", propositions);
+
+        try {
+            String contentJson = new ObjectMapper().writeValueAsString(jsonEnvoye);
+
+            // ✅ Log avant envoi
+            System.out.println("JSON envoyé à Mistral (étape 2) :\n" + contentJson);
+
+            Map<String, Object> message = Map.of("role", "user", "content", contentJson);
+            Map<String, Object> body = Map.of(
+                    "agent_id", "ag:359ab99b:20250522:untitled-agent:0d2e13d1",
+                    "messages", List.of(message)
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth("W4gjIutIAxTtxm3VbjMwDhuZrsgkvs9H");
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> request = new HttpEntity<>(new ObjectMapper().writeValueAsString(body), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity("https://api.mistral.ai/v1/agents/completions", request, String.class);
+
+            // ✅ Log de la réponse
+            //System.out.println("📦 Réponse finale Mistral :\n" + response.getBody());
+
+            Map<String, Object> analyse = extraireProduitsSelectionnesDepuisMistral(response.getBody());
+            System.out.println("Réponse LLM : " + analyse.get("reponseUtilisateur"));
+            System.out.println("Produits sélectionnés : " + analyse.get("produitsSelectionnes"));
+
+
+        } catch (Exception e) {
+            System.out.println("Erreur dans l'appel API final à Mistral : " + e.getMessage());
+        }
+    }
+
+    public Map<String, Object> extraireProduitsSelectionnesDepuisMistral(String jsonReponseMistral) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            JsonNode racine = mapper.readTree(jsonReponseMistral);
+            String contentJsonString = racine
+                    .path("choices")
+                    .get(0)
+                    .path("message")
+                    .path("content")
+                    .asText();
+
+            JsonNode contentJson = mapper.readTree(contentJsonString);
+            String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
+
+            List<Map<String, Integer>> produits = new ArrayList<>();
+            for (JsonNode p : contentJson.path("produitsSelectionnes")) {
+                produits.add(Map.of(
+                        "idProduit", p.path("idProduit").asInt(),
+                        "quantite", p.path("quantite").asInt()
+                ));
+            }
+
+            return Map.of(
+                    "reponseUtilisateur", reponseUtilisateur,
+                    "produitsSelectionnes", produits
+            );
+
+        } catch (Exception e) {
+            System.out.println("Erreur de parsing réponse finale Mistral : " + e.getMessage());
+            return Map.of(
+                    "reponseUtilisateur", "Erreur parsing",
+                    "produitsSelectionnes", Collections.emptyList()
+            );
+        }
+    }
+
+
+
+
+
 
 }
