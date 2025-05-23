@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -104,18 +103,17 @@ public class PropositionService {
                         String[] splitter = line.split(";");
                         String nom = splitter[1];
                         listeErreurs.add(nom + " : " + e.getMessage());
-                        throw new RuntimeException("Erreur de format de nombre dans le fichier CSV", e);
                     }
                 });
                 System.out.println(listeErreurs);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Erreur lors de la gestion du fichier CSV", e);
             } finally {
                 Files.deleteIfExists(tempFilePath);
             }
 
-        } catch (IOException e) {
-            throw new RuntimeException("Erreur lors de la gestion du fichier CSV", e);
+        } catch (Exception e) {
+            return null;
         }
 
         return null;
