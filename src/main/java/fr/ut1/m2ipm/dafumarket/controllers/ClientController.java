@@ -65,4 +65,10 @@ public class ClientController {
         this.clientService.sendRecapitulatif(idClient, commandeId);
     }
 
+    @DeleteMapping("/{idClient}/panier")
+    public ResponseEntity<Void> supprimerPanier(@PathVariable long idClient) {
+        clientService.supprimerPanier(idClient);
+        return ResponseEntity.noContent().build();
+    }
+
 }

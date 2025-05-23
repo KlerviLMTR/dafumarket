@@ -106,9 +106,8 @@ public class PropositionService {
                         listeErreurs.add(nom + " : " + e.getMessage());
                         throw new RuntimeException("Erreur de format de nombre dans le fichier CSV", e);
                     }
-
-                    System.out.println(listeErreurs);
                 });
+                System.out.println(listeErreurs);
             } catch (IOException e) {
                 throw new RuntimeException("Erreur lors de la gestion du fichier CSV", e);
             } finally {
