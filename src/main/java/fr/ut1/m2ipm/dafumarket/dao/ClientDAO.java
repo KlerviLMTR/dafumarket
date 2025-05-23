@@ -7,6 +7,7 @@ import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.Compte;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.repositories.ClientRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.CommandeRepository;
@@ -38,6 +39,10 @@ public class ClientDAO {
         this.commandeRepository = commandeRepository;
     }
 
+    public Client getClientByCompte(Compte compte) {
+        Optional<Client> client = clientRepository.findByCompte(compte);
+        return client.orElse(null);
+    }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
 
