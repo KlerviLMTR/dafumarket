@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
+
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
@@ -27,11 +28,11 @@ public class MagasinService {
         this.commandeMapper = commandeMapper;
     }
 
-    public List<MagasinDTO> getAllMagasinsAvecNombreProduits(){
+    public List<MagasinDTO> getAllMagasinsAvecNombreProduits() {
         return this.magasinDAO.getAllMagasinsAvecNombreProduits();
     }
 
-    public MagasinDTO getMagasinById(int id){
+    public MagasinDTO getMagasinById(int id) {
         return this.magasinDAO.getMagasinById(id);
     }
 
@@ -87,5 +88,13 @@ public class MagasinService {
 
     public List<CommandeDTO> getAllCommandes() {
         return this.commandeDAO.getAllCommandes();
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinRayon(int idMagasin, int idRayon) {
+        return this.magasinDAO.getAllProduitsProposesMagasinRayon(idMagasin, idRayon);
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinCategorie(int idMagasin, int idRayon) {
+        return this.magasinDAO.getAllProduitsProposesMagasinCategorie(idMagasin, idRayon);
     }
 }

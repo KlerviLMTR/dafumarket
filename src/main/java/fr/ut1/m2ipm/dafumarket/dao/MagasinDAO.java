@@ -12,11 +12,13 @@ import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.Promotion;
+import fr.ut1.m2ipm.dafumarket.models.Rayon;
 import fr.ut1.m2ipm.dafumarket.models.associations.AssocierPromo;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,13 +36,16 @@ public class MagasinDAO {
     private final ProduitRepository produitRepo;
     private final CommandeRepository commandeRepo;
     private final CommandeMapper commandeMapper;
+    private final RayonRepository rayonRepo;
 
-    public MagasinDAO(MagasinRepository magasinRepo, PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper) {
+    public MagasinDAO(MagasinRepository magasinRepo,
+                      PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper, RayonRepository rayonRepo) {
         this.magasinRepo = magasinRepo;
         this.propositionRepo = propositionRepo;
         this.propositionDAO = propositionDAO;
         this.associerPromoRepository = associerPromoRepository;
         this.produitRepo = produitRepo;
+        this.rayonRepo = rayonRepo;
         this.commandeRepo = commandeRepo;
         this.commandeMapper = commandeMapper;
 
@@ -113,16 +118,50 @@ public class MagasinDAO {
         System.out.println("Magasin : " + magasin);
 
         // Recuperer les produits proposes par le magasin
-        List<Proposition> produitsProposes = this.propositionRepo.findAllByMagasin_IdMagasin( idMagasin);
+        List<Proposition> produitsProposes = this.propositionRepo.findAllByMagasin_IdMagasin(idMagasin);
         // Iterer sur la liste des propositions et y ajouter les promos trouvées si elles sont valides
-        for (Proposition p : produitsProposes){
+        for (Proposition p : produitsProposes) {
             ProduitProposeDTO dto = this.creerProduitDTOAvecPromosFromProposition(p);
             produitsProposesDTO.add(dto);
         }
         return produitsProposesDTO;
     }
 
-    private ProduitProposeDTO creerProduitDTOAvecPromosFromProposition( Proposition propositionDb) {
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinRayon(int idMagasin, int idRayon) {
+        List<ProduitProposeDTO> produitsProposesDTO = new ArrayList<>();
+        System.out.println("Debut recherche produits");
+        Magasin magasin = this.magasinRepo.findById(idMagasin)
+                .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        System.out.println("Magasin : " + magasin);
+
+        // Recuperer les produits proposes par le magasin
+        List<Proposition> produitsProposes = this.propositionRepo.findAllByRayonAndMagasin(idRayon, idMagasin);
+        // Iterer sur la liste des propositions et y ajouter les promos trouvées si elles sont valides
+        for (Proposition p : produitsProposes) {
+            ProduitProposeDTO dto = this.creerProduitDTOAvecPromosFromProposition(p);
+            produitsProposesDTO.add(dto);
+        }
+        return produitsProposesDTO;
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesMagasinCategorie(int idMagasin, int idCategorie) {
+        List<ProduitProposeDTO> produitsProposesDTO = new ArrayList<>();
+        System.out.println("Debut recherche produits");
+        Magasin magasin = this.magasinRepo.findById(idMagasin)
+                .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
+        System.out.println("Magasin : " + magasin);
+
+        // Recuperer les produits proposes par le magasin
+        List<Proposition> produitsProposes = this.propositionRepo.findAllByCategorieAndMagasin(idCategorie, idMagasin);
+        // Iterer sur la liste des propositions et y ajouter les promos trouvées si elles sont valides
+        for (Proposition p : produitsProposes) {
+            ProduitProposeDTO dto = this.creerProduitDTOAvecPromosFromProposition(p);
+            produitsProposesDTO.add(dto);
+        }
+        return produitsProposesDTO;
+    }
+
+    private ProduitProposeDTO creerProduitDTOAvecPromosFromProposition(Proposition propositionDb) {
         // Cherche une promotion active (période actuelle)
         Optional<AssocierPromo> optAssoc = associerPromoRepository
                 .findActiveByProduitAndMagasin(
