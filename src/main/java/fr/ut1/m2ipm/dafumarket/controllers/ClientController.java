@@ -97,15 +97,15 @@ public class ClientController {
     ) {
         OffsetDateTime creneau = body.getCreneauHoraire();
         int idMagasinChoisi = body.getIdMagasin();
-        if (creneau!=null){
+        if (creneau != null) {
 
-            CommandeDTO c = this.clientService.confirmerCommande(idClient, idMagasinChoisi,  creneau);
+            CommandeDTO c = this.clientService.confirmerCommande(idClient, idMagasinChoisi, creneau);
             return ResponseEntity.ok(c);
-        }
-        else{
+        } else {
             return ResponseEntity.badRequest().build();
 
         }
+    }
 
     @PostMapping("/{idClient}/{commandeId}")
     public void sendRecapitulatif(@PathVariable long idClient, @PathVariable long commandeId) {

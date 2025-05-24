@@ -59,18 +59,18 @@ public class ClientService {
     private final PanierDAO panierDao ;
     private final PanierMapper panierMapper ;
     private final PropositionProduitDAO propositionDAO ;
-    private final CommandeDAO commandeDAO ;
+    private final CommandeDAO commandeDao ;
     private final CommandeMapper commandeMapper ;
     private final JavaMailSender mailSender;
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO, CommandeDAO commandeDAO, CommandeMapper commandeMapper, JavaMailSender mailSender,) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO, CommandeDAO commandeDAO, CommandeMapper commandeMapper, JavaMailSender mailSender) {
 
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
         this.panierMapper = panierMapper;
         this.propositionDAO = propositionDAO;
-        this.commandeDAO = commandeDAO;
+        this.commandeDao = commandeDAO;
         this.mailSender = mailSender;
         this.commandeMapper = commandeMapper;
     }
@@ -490,7 +490,7 @@ public class ClientService {
             LocalDateTime creneauDate = creneau
                     .atZoneSameInstant(ZoneId.systemDefault())
                     .toLocalDateTime();
-            Commande c = this.commandeDAO.creerCommande(panier, creneauDate);
+            Commande c = this.commandeDao.creerCommande(panier, creneauDate);
 
             return this.commandeMapper.toDto(c);
         }
