@@ -10,12 +10,13 @@ public class MagasinDTO {
     private String ville;
     private Integer cp;
     private String coordonneesGps;
+    private double chiffreAffaire;
     private long countProduitsProposes; // Champ supplémentaire
 
     public MagasinDTO() {}
 
     public MagasinDTO(Integer idMagasin, String nom, String numero, String adresse, String ville,
-                      Integer cp, String coordonneesGps, long countProduitsProposes) {
+                      Integer cp, String coordonneesGps,double chiffreAffaire,  long countProduitsProposes) {
         this.idMagasin = idMagasin;
         this.nom = nom;
         this.numero = numero;
@@ -23,6 +24,7 @@ public class MagasinDTO {
         this.ville = ville;
         this.cp = cp;
         this.coordonneesGps = coordonneesGps;
+        this.chiffreAffaire = chiffreAffaire;
         this.countProduitsProposes = countProduitsProposes;
     }
 
@@ -41,6 +43,7 @@ public class MagasinDTO {
     public void setNom(String nom) {
         this.nom = nom;
     }
+
 
     public String getNumero() {
         return numero;
@@ -80,6 +83,13 @@ public class MagasinDTO {
 
     public void setCoordonneesGps(String coordonneesGps) {
         this.coordonneesGps = coordonneesGps;
+    }
+
+    public double getChiffreAffaire() {
+        return chiffreAffaire;
+    }
+    public void setChiffreAffaire(double chiffreAffaire) {
+        this.chiffreAffaire = chiffreAffaire;
     }
 
     public long getCountProduitsProposes() {

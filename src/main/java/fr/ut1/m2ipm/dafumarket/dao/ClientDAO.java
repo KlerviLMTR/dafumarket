@@ -25,18 +25,23 @@ import java.util.Optional;
 public class ClientDAO {
 
 
+    @Autowired
+    private EntityManager em;
+
     private final ClientRepository clientRepository;
     private final PanierRepository panierRepository;
     private final PanierMapper panierMapper;
     private final CommandeMapper commandeMapper;
     private final CommandeRepository commandeRepository;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
         this.commandeMapper = commandeMapper;
         this.commandeRepository = commandeRepository;
+        //this.em = em;
+
     }
 
     public Client getClientByCompte(Compte compte) {
@@ -76,6 +81,10 @@ public class ClientDAO {
         Panier panier = new Panier();
         panier.setClient(client);
         panierRepository.save(panier);
+        //this.em.clear();
+        this.em.flush();
+        this.em.clear();
+
         return panier;
     }
 

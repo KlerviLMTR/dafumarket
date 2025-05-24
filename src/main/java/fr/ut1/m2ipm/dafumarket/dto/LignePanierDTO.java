@@ -36,4 +36,18 @@ public class LignePanierDTO {
     public int getTauxPromo()     { return tauxPromo; }
     public double getPrixAvecPromo() { return prixAvecPromo; }
 
+    @Override
+    public String toString(){
+
+            return "LignePanierDTO{" +
+                    "idProduit="    + idProduit    +
+                    ", idMagasin="  + idMagasin    +
+                    ", nomProduit='" + nomProduit  + '\'' +
+                    ", imageUrl='"  + imageUrl    + '\'' +
+                    ", prixMagasin="+ prixMagasin +
+                    ", quantite="   + quantite    +
+                    ", tauxPromo="  + tauxPromo   +
+                    ", prixAvecPromo=" + prixAvecPromo +
+                    '}';
+    }
 }
