@@ -102,27 +102,9 @@ public class ClientController {
         return this.clientService.getPostItById(idClient,idPostIt);
     }
 
-    @PostMapping("/{idClient}/produits-par-ingredients")
-    public ResponseEntity<?> getProduitsParIngredients(
-            @PathVariable long idClient,
-            @RequestBody Map<String, List<String>> body) {
-
-        List<String> ingredients = body.get("ingredients");
-
-        if (ingredients == null || ingredients.isEmpty()) {
-            return ResponseEntity.badRequest().body("Champ 'ingredients' requis dans le corps JSON.");
-        }
-
-        List<ProduitDTO> tousLesProduits = produitService.getAllProduits();
-        Map<String, List<ProduitDTO>> resultats = clientService.trouverProduitsSimilaires(tousLesProduits, ingredients);
-
-        return ResponseEntity.ok(resultats);
-    }
-
-    @GetMapping("/{idClient}/test-mistral")
-    public ResponseEntity<Void> testMistral(@PathVariable long idClient) {
-        clientService.testerPremierAppelMistral();
-        return ResponseEntity.ok().build();
+    @PostMapping("/{idClient}/test-mistral")
+    public ResponseEntity<Map<String, Object>> appelLLM(@RequestBody String phrase) {
+        return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
     }
 
 }

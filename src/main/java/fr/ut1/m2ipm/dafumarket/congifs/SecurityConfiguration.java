@@ -40,7 +40,6 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/admin/**").permitAll()
                                 .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/api/clients/**").permitAll()
-                                .requestMatchers("/api/clients/**/produits-par-ingredients").permitAll()
 
 //                        .requestMatchers("/api/rayons/**").permitAll()
 //                        .requestMatchers("/api/produits/**").permitAll()
