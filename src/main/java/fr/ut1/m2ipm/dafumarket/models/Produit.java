@@ -18,6 +18,8 @@ public class Produit {
     private String nutriscore;
     private String origine;
     private double prixRecommande;
+
+    @Column(columnDefinition="TEXT")
     private String imageUrl;
 
     @OneToMany(mappedBy = "produit")
