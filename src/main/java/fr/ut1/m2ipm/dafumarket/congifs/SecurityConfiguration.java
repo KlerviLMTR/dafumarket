@@ -37,10 +37,12 @@ public class SecurityConfiguration {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/rayons/**").permitAll()
-//                        .requestMatchers("/api/produits/**").permitAll()
-//                        .requestMatchers("/api/magasins/**").permitAll()
-                                .anyRequest().authenticated()
+                            .requestMatchers("/api/rayons/**").permitAll()
+                            .requestMatchers("/api/produits/**").permitAll()
+                            .requestMatchers("/api/magasins/**").permitAll()
+                        .requestMatchers("/api/clients/**").permitAll()
+
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
