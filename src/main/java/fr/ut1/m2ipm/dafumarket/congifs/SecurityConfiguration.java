@@ -36,12 +36,11 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/api/rayons/**").permitAll()
-                            .requestMatchers("/api/produits/**").permitAll()
-                            .requestMatchers("/api/magasins/**").permitAll()
-                        .requestMatchers("/api/clients/**").permitAll()
-
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/rayons/**").permitAll()
+                        .requestMatchers("/api/produits/**").permitAll()
+                        .requestMatchers("/api/magasins/**").permitAll()
+                        .requestMatchers("/api/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
