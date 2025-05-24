@@ -17,11 +17,11 @@ public class Magasin {
     private String ville;
     private Integer cp;
     private String coordonneesGps;
-    private Double chiffreAffaires;
+    private double chiffreAffaires;
 
     public Magasin() {}
 
-    public Magasin(Integer idMagasin, String nom, String numero, String adresse, String ville, Integer cp, String coordonneesGps) {
+    public Magasin(Integer idMagasin, String nom, String numero, String adresse, String ville, Integer cp,  String coordonneesGps,double chiffreAffaires ) {
         this.idMagasin = idMagasin;
         this.nom = nom;
         this.numero = numero;
@@ -29,7 +29,7 @@ public class Magasin {
         this.ville = ville;
         this.cp = cp;
         this.coordonneesGps = coordonneesGps;
-        this.chiffreAffaires = 0.0;
+        this.chiffreAffaires = chiffreAffaires;
     }
 
     public Integer getIdMagasin() { return idMagasin; }

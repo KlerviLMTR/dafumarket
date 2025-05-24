@@ -2,11 +2,9 @@ package fr.ut1.m2ipm.dafumarket.dao;
 
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
-import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
-import fr.ut1.m2ipm.dafumarket.mappers.ProduitMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ProduitProposeMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
@@ -17,6 +15,7 @@ import fr.ut1.m2ipm.dafumarket.models.associations.AssocierPromo;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 
@@ -49,6 +48,10 @@ public class MagasinDAO {
         this.commandeRepo = commandeRepo;
         this.commandeMapper = commandeMapper;
 
+    }
+
+    public List<Magasin> getAllMagasin() {
+        return magasinRepo.findAll();
     }
 
     public List<MagasinDTO> getAllMagasinsAvecNombreProduits() {
@@ -112,7 +115,6 @@ public class MagasinDAO {
 
     public List<ProduitProposeDTO> getAllProduitsProposesMagasin(int idMagasin) {
         List<ProduitProposeDTO> produitsProposesDTO = new ArrayList<>();
-        System.out.println("Debut recherche produits");
         Magasin magasin = this.magasinRepo.findById(idMagasin)
                 .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
         System.out.println("Magasin : " + magasin);
@@ -234,5 +236,12 @@ public class MagasinDAO {
         return commandes.stream()
                 .map(commandeMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void mettreAJourCAMagasin(Magasin magasin, double montant){
+        double nouveauCA = magasin.getChiffreAffaires() + montant;
+        magasin.setChiffreAffaires(nouveauCA);
+        magasinRepo.save(magasin);
     }
 }

@@ -6,7 +6,7 @@ CREATE TABLE produit (
     nutriscore CHAR(1),
     origine VARCHAR(50),
     prix_recommande DECIMAL(10,2) NOT NULL,
-    image_url VARCHAR(255),
+    image_url TEXT,
     id_unite INT NOT NULL,
     id_marque INT NOT NULL,
     FOREIGN KEY (id_unite) REFERENCES unite(id_unite),
