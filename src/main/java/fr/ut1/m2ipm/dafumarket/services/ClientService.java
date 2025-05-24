@@ -11,10 +11,7 @@ import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
-import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
-import fr.ut1.m2ipm.dafumarket.dto.LignePanierDTO;
-import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
-import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
@@ -36,6 +33,7 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +53,12 @@ public class ClientService {
     private final CommandeDAO commandeDao;
     private final JavaMailSender mailSender;
     private final CommandeMapper commandeMapper;
+    private final ProduitService produitService;
+    private final LlmService llmService;
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper) {
+
+
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
@@ -64,6 +66,8 @@ public class ClientService {
         this.commandeDao = commandeDao;
         this.mailSender = mailSender;
         this.commandeMapper = commandeMapper;
+        this.produitService = produitService;
+        this.llmService = llmService;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -366,5 +370,11 @@ public class ClientService {
             panierDao.supprimerPanier(panier);
         }
     }
+
+    public Map<String, Object> traiterDemandeLLM(String message) {
+        List<ProduitDTO> produits = produitService.getAllProduits();
+        return llmService.traiterRecetteAvecLLM(message, produits);
+    }
+
 
 }

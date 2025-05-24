@@ -37,6 +37,13 @@ public class SecurityConfiguration {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/admin/**").permitAll()
+                                .requestMatchers("/api/**").permitAll()
+                                .requestMatchers("/api/clients/**").permitAll()
+                                .requestMatchers("/api/clients/**/test-mistral").permitAll()
+
+
+
 //                        .requestMatchers("/api/rayons/**").permitAll()
 //                        .requestMatchers("/api/produits/**").permitAll()
 //                        .requestMatchers("/api/magasins/**").permitAll()

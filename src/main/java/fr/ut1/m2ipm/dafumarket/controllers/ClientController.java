@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -91,4 +92,8 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{idClient}/test-mistral")
+    public ResponseEntity<Map<String, Object>> appelLLM(@RequestBody String phrase) {
+        return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
+    }
 }
