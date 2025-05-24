@@ -64,4 +64,11 @@ public class AppartenirPanierId implements Serializable {
     public int hashCode() {
         return Objects.hash(idPanier, produit, magasin);
     }
+
+    @Override
+    public String toString() {
+        return "AppartenirPanierId[idPanier="   + idPanier
+                + ", idProduit="  + produit
+                + ", idMagasin="  + magasin + "]";
+    }
 }

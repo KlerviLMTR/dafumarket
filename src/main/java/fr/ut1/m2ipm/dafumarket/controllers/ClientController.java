@@ -8,17 +8,22 @@ import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Compte;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ConfirmationPanierRequest;
+import fr.ut1.m2ipm.dafumarket.dto.MessagePanierDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
+
 import fr.ut1.m2ipm.dafumarket.utils.AuthUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,7 +80,29 @@ public class ClientController {
         } else {
             return ResponseEntity.noContent().build();
         }
+    }
 
+    @GetMapping("/{idClient}/verifierPanier")
+    public ResponseEntity<MessagePanierDTO> verifierPanier(@PathVariable long idClient){
+        MessagePanierDTO m = this.clientService.verifierPanier(idClient);
+        return  ResponseEntity.ok(m);
+    }
+
+    @PostMapping("/{idClient}/confirmerCommande")
+    public ResponseEntity<CommandeDTO> confirmerCommande(
+            @PathVariable long idClient,
+            @RequestBody ConfirmationPanierRequest body
+    ) {
+        OffsetDateTime creneau = body.getCreneauHoraire();
+        int idMagasinChoisi = body.getIdMagasin();
+        if (creneau != null) {
+
+            CommandeDTO c = this.clientService.confirmerCommande(idClient, idMagasinChoisi, creneau);
+            return ResponseEntity.ok(c);
+        } else {
+            return ResponseEntity.badRequest().build();
+
+        }
     }
 
     @PostMapping("/{idClient}/{commandeId}")
@@ -87,6 +114,7 @@ public class ClientController {
     public ResponseEntity<Void> supprimerPanier(@PathVariable long idClient) {
         clientService.supprimerPanier(idClient);
         return ResponseEntity.noContent().build();
+
     }
 
     @GetMapping("/{idClient}")
