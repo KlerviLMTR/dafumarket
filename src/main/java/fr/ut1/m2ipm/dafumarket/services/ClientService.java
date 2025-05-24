@@ -162,13 +162,15 @@ public class ClientService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
 
+
+
             helper.setTo(client.getEmail());
             helper.setSubject("Dafu Market : facture pour la Commande #" + commandeId);
             Commande commande = this.commandeDao.getCommandeDbByID((int) commandeId);
             CommandeDTO commandeDTO = this.commandeMapper.toDto(commande);
             String date = commandeDTO.getDateHeureRetrait().toString();
 
-            helper.setText("Bonjour " + client.getPrenom() + "\n\nVotre facture du "+ date + " pour la commande #"+ commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
+            helper.setText("Bonjour " + client.getPrenom() + ",\n\nVotre facture du "+ date + " pour la commande #"+ commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
                     "\n\nCordialement,\nL'équipe Dafu Market");
 
             helper.addAttachment("facture.pdf", dataSource);
@@ -491,7 +493,7 @@ public class ClientService {
                     .atZoneSameInstant(ZoneId.systemDefault())
                     .toLocalDateTime();
             Commande c = this.commandeDao.creerCommande(panier, creneauDate);
-
+            this.sendRecapitulatif(idClient, c.getIdCommande());
             return this.commandeMapper.toDto(c);
         }
         else{
