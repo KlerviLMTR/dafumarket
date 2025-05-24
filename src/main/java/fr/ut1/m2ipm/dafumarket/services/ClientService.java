@@ -3,15 +3,15 @@ package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Transient;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -126,47 +126,49 @@ public class ClientService {
      * @param idClient
      * @return
      */
-    public MessagePanier verifierPanier(long idClient) {
+    public MessagePanierDTO verifierPanier(long idClient) {
         // 1)  Recuperer le panier DTO du client
         Optional<PanierDTO> panier = this.clientDao.getActivePanierByIdClient(idClient);
         //2) si le panier existe, itérer sur les lignes et compter les totaux de produits
+        MessagePanierDTO message = new MessagePanierDTO("");
 
         if(panier.isPresent()) {
             PanierDTO panierDTO = panier.get();
-            HashMap<String, Integer> resultatsVerif = this.verifierStockMagasinPourUnPanier(panierDTO);
-            boolean stocksOk = resultatsVerif.get("nbProduitsCommandables").intValue() == resultatsVerif.get("nbProduitsVoulus").intValue();
+            StockPanierMagasinDTO res = this.verifierStockMagasinPourUnPanier(panierDTO);
 
-            System.out.println( resultatsVerif.get("nbProduitsCommandables"));
-            System.out.println(resultatsVerif.get("nbProduitsVoulus"));
-            System.out.println(stocksOk);
-            if (stocksOk){
+            System.out.println( "Voulus:"+res.getNbProduitsVoulus());
+            System.out.println("Commandables ici : "+res.getNbProduitsCommandables() );
+
+            if (res.isPanierComplet()){
                 // Cas ideal : les stocks sont adéquats, on renvoie au client un message pour demander de confirmer la commande et le créneau
-                return new MessagePanier(true,"Toutes les lignes de produit sont en stock. Veuillez confirmer le panier pour ce magasin.", resultatsVerif.get("nbProduitsCommandables"), resultatsVerif.get("nbProduitsVoulus"), resultatsVerif.get("nblignesConformes").intValue() );
+                message = new MessagePanierDTO("Toutes les lignes de produit sont en stock. Veuillez confirmer le panier pour ce magasin.");
+                message.addMagasin(res);
             }
             else{
-                return new MessagePanier(false, "Certains produits ne sont pas disponibles. Vous pouvez choisir de poursuivre avec ce magasin ou en sélectionner un autre", resultatsVerif.get("nbProduitsVoulus").intValue(), resultatsVerif.get("nbProduitsCommandables"),resultatsVerif.get("nblignesConformes").intValue());
+                return new MessagePanierDTO("Certains produits ne sont pas disponibles. Vous pouvez choisir de poursuivre avec ce magasin ou en sélectionner un autre");
                 // Calculer les possibilités dans les autres magasins
 
             }
         }
-        return null;
+        return message;
+
     }
 
 
     /**
      * Verifie les stocks du magasin correspondant au panier pour chaque ligne de produit (étape 1/2 de la confirmation du magasin)
      * @param panierDTO
-     * @return
+     * @return StockPanierMagasinDTO
      */
-    private HashMap<String,Integer> verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
+    private StockPanierMagasinDTO verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
         int nombreDeProduitsVoulus = 0;
         int nombreDeProduitsVoulusEnStock = 0;
         int nombresDeMatchs = 0;
 
 
         // Recuperer l'id du magasin associé au panier
-        int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
-
+        int idMagasin = panierDTO.getLignes().getFirst().getIdMagasin();
+        Magasin m = new Magasin();
         for (LignePanierDTO lignePanier: panierDTO.getLignes()){
             //Compter ce que veut le client
             int quantiteVoulue = lignePanier.getQuantite();
@@ -176,26 +178,29 @@ public class ClientService {
             // Recuperer la propal
             Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
             if (optProposition.isPresent()) {
-                int stockMagasin = optProposition.get().getStock();
+                Proposition proposition = optProposition.get();
+                m = proposition.getMagasin();
+                int stockMagasin = proposition.getStock();
                 if (stockMagasin > quantiteVoulue) {
                     nombresDeMatchs++;
                     nombreDeProduitsVoulusEnStock += quantiteVoulue;
                 }
-
             }
-
         }
+        boolean isPanierComplet = nombresDeMatchs == panierDTO.getLignes().size() && nombreDeProduitsVoulus == nombreDeProduitsVoulusEnStock;
         System.out.println("NombresDeMatchs : " + nombresDeMatchs);
-        HashMap<String,Integer> resultat = new HashMap<>();
-        resultat.put("nbProduitsCommandables", nombreDeProduitsVoulusEnStock);
-        resultat.put("nbProduitsVoulus", nombreDeProduitsVoulus);
-        resultat.put("nblignesConformes",nombresDeMatchs);
-        return resultat;
+        System.out.println(isPanierComplet);
+
+       return new StockPanierMagasinDTO(m, nombreDeProduitsVoulusEnStock,nombreDeProduitsVoulus, panierDTO.getLignes().size(), nombresDeMatchs,isPanierComplet);
+
+
     }
 
 
+
+
     /**
-     * Confirme la commande: (étape 2/2 de la confirmation du magasin)
+     * Confirme la commande: (étape 2/2 de la confirmation du magasin)f
      * - Mettre à jour le panier avec les stocks réellement disponibles en magasin
      * - Cree la commande associée au panier avec le bon créneau horaire
      * @param idClient
@@ -215,9 +220,6 @@ public class ClientService {
             Commande c = this.commandeDAO.creerCommande(panier, creneauDate);
 
             return this.commandeMapper.toDto(c);
-
-
-
         }
         else{
             throw new EntityNotFoundException("La panier du client n'existe pas !");
@@ -274,6 +276,8 @@ public class ClientService {
         }
         return panierDb;
     }
+
+
 
 
 
