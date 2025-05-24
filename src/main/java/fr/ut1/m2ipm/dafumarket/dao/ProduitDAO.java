@@ -78,9 +78,6 @@ public class ProduitDAO {
         produitRepository.save(produit);
 
         // Ajout des labels (relation pivot)
-        System.out.println("Labels : " + designationsLabel.length);
-        System.out.println("hiha");
-        System.out.println("Labels : " + designationsLabel);
         if (designationsLabel.length == 0) {
             System.out.println("Pas de labels");
         }
