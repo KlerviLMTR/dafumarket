@@ -30,6 +30,7 @@ class CategoriesSeeder {
 
                 categorieRepo.saveAll(List.of(
                         new Categorie(null, "Fromages", frais),
+                        new Categorie(null, "Oeufs", frais),
                         new Categorie(null, "Yaourts et desserts lactés", frais),
                         new Categorie(null, "Beurres et crèmes", frais),
                         new Categorie(null, "Fruits frais", fruitsLegumes),
@@ -53,7 +54,9 @@ class CategoriesSeeder {
                         new Categorie(null, "Pâtes et riz", epiceriesalee),
                         new Categorie(null, "Conserves salées", epiceriesalee),
                         new Categorie(null, "Sauces et condiments", epiceriesalee),
+                        new Categorie(null, "Huiles et vinaigres", epiceriesalee),
                         new Categorie(null, "Biscuits", epiceriesucree),
+                        new Categorie(null, "Pâtisserie", epiceriesucree),
                         new Categorie(null, "Chocolats et confiseries", epiceriesucree),
                         new Categorie(null, "Petit-déjeuner", epiceriesucree),
                         new Categorie(null, "Surgelés légumes", surgeles),
