@@ -8,22 +8,17 @@ import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.Compte;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
-import fr.ut1.m2ipm.dafumarket.dto.ConfirmationPanierRequest;
-import fr.ut1.m2ipm.dafumarket.dto.MessagePanierDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
-
 import fr.ut1.m2ipm.dafumarket.utils.AuthUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,56 +48,36 @@ public class ClientController {
 
     /**
      * Recupere et renvoie les commandes correspondant à l'id du client fourni
-     *
-     * @return List<CommandeDTO>
+     * @return  List<CommandeDTO>
      */
     @GetMapping("/{idClient}/commandes")
     public List<CommandeDTO> getToutesLesCommandes(@PathVariable long idClient) {
         return this.clientService.getAllCommandesByIdClient(idClient);
     }
 
-    @GetMapping("/panier")
-    public Optional<PanierDTO> getActivePanierByIdClient() {
-        Compte compte = AuthUtils.getCurrentUser();
-        Client client = clientDAO.getClientByCompte(compte);
-        return this.clientService.getActivePanierByIdClient(client.getIdClient());
+
+    @GetMapping("/{idClient}")
+    public Client getClient(@PathVariable long idClient) {
+        return this.clientService.getClient(idClient);
+    }
+
+    @GetMapping("/{idClient}/panier")
+    public Optional<PanierDTO> getActivePanierByIdClient(@PathVariable long idClient) {
+        return this.clientService.getActivePanierByIdClient(idClient);
     }
 
 
-    @PostMapping("/panier/{idProduit}")
-    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@PathVariable(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
-        System.out.println("ajouterProduitAuPanier ");
-        Compte compte = AuthUtils.getCurrentUser();
-        Client client = clientDAO.getClientByCompte(compte);
-        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(client.getIdClient(), idProduit, quantite, idMagasin);
-        if (panierDTO.isPresent()) {
+    @PostMapping("/{idClient}/panier")
+    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@PathVariable long idClient,
+                                                            @RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
+        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(idClient, idProduit, quantite,idMagasin);
+        if(panierDTO.isPresent()) {
             return ResponseEntity.ok(panierDTO);
-        } else {
+        }
+        else{
             return ResponseEntity.noContent().build();
         }
-    }
 
-    @GetMapping("/{idClient}/verifierPanier")
-    public ResponseEntity<MessagePanierDTO> verifierPanier(@PathVariable long idClient){
-        MessagePanierDTO m = this.clientService.verifierPanier(idClient);
-        return  ResponseEntity.ok(m);
-    }
-
-    @PostMapping("/{idClient}/confirmerCommande")
-    public ResponseEntity<CommandeDTO> confirmerCommande(
-            @PathVariable long idClient,
-            @RequestBody ConfirmationPanierRequest body
-    ) {
-        OffsetDateTime creneau = body.getCreneauHoraire();
-        int idMagasinChoisi = body.getIdMagasin();
-        if (creneau != null) {
-
-            CommandeDTO c = this.clientService.confirmerCommande(idClient, idMagasinChoisi, creneau);
-            return ResponseEntity.ok(c);
-        } else {
-            return ResponseEntity.badRequest().build();
-
-        }
     }
 
     @PostMapping("/{idClient}/{commandeId}")
@@ -114,12 +89,6 @@ public class ClientController {
     public ResponseEntity<Void> supprimerPanier(@PathVariable long idClient) {
         clientService.supprimerPanier(idClient);
         return ResponseEntity.noContent().build();
-
-    }
-
-    @GetMapping("/{idClient}")
-    public Client getClient(@PathVariable long idClient) {
-        return this.clientService.getClient(idClient);
     }
 
 }
