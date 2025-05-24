@@ -48,33 +48,31 @@ public class ClientController {
 
     /**
      * Recupere et renvoie les commandes correspondant à l'id du client fourni
-     * @return  List<CommandeDTO>
+     *
+     * @return List<CommandeDTO>
      */
     @GetMapping("/{idClient}/commandes")
     public List<CommandeDTO> getToutesLesCommandes(@PathVariable long idClient) {
         return this.clientService.getAllCommandesByIdClient(idClient);
     }
 
-
-    @GetMapping("/{idClient}")
-    public Client getClient(@PathVariable long idClient) {
-        return this.clientService.getClient(idClient);
-    }
-
-    @GetMapping("/{idClient}/panier")
-    public Optional<PanierDTO> getActivePanierByIdClient(@PathVariable long idClient) {
-        return this.clientService.getActivePanierByIdClient(idClient);
+    @GetMapping("/panier")
+    public Optional<PanierDTO> getActivePanierByIdClient() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.getActivePanierByIdClient(client.getIdClient());
     }
 
 
-    @PostMapping("/{idClient}/panier")
-    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@PathVariable long idClient,
-                                                            @RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
-        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(idClient, idProduit, quantite,idMagasin);
-        if(panierDTO.isPresent()) {
+    @PostMapping("/panier/{idProduit}")
+    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@PathVariable(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
+        System.out.println("ajouterProduitAuPanier ");
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(client.getIdClient(), idProduit, quantite, idMagasin);
+        if (panierDTO.isPresent()) {
             return ResponseEntity.ok(panierDTO);
-        }
-        else{
+        } else {
             return ResponseEntity.noContent().build();
         }
 
@@ -89,6 +87,11 @@ public class ClientController {
     public ResponseEntity<Void> supprimerPanier(@PathVariable long idClient) {
         clientService.supprimerPanier(idClient);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{idClient}")
+    public Client getClient(@PathVariable long idClient) {
+        return this.clientService.getClient(idClient);
     }
 
 }

@@ -27,12 +27,22 @@ public class ProduitsController {
     }
 
     /**
+     * Recupere et renvoie tous les produits correspondant à la recherche fournie (indépendamment du magasin - prix recommandé uniquement)
+     */
+    @GetMapping("/search")
+    public List<ProduitDTO> getProduitBySearch(@RequestParam("search") String search,
+                                               @RequestParam("limit") int limit) {
+        return produitService.getProduitBySearch(search, limit);
+    }
+
+    /**
      * Recupere et renvoie tous les produits indépendamment du magasin qui les propose (prix recommandé et non effectif)
      */
     @GetMapping
     public List<ProduitDTO> getAllProduits() {
         return this.produitService.getAllProduits();
     }
+
 
     /**
      * Recupere et renvoie le produit correspondant à l'identifiant fourni (indépendamment du magasin - prix recommandé uniquement)
@@ -50,14 +60,6 @@ public class ProduitsController {
     @GetMapping(value = {"/categorie/{idCategorie}"})
     public List<ProduitDTO> getProduitsByCategorie(@PathVariable Integer idCategorie) {
         return this.produitService.getProduitsByCategorie(idCategorie);
-    }
-    /**
-     *  Recupere et renvoie tous les produits correspondant à la recherche fournie (indépendamment du magasin - prix recommandé uniquement)
-     */
-    @GetMapping("/search")
-    public List<ProduitDTO> getProduitBySearch(@RequestParam("search") String search,
-                                               @RequestParam("limit") int limit) {
-        return produitService.getProduitBySearch(search, limit);
     }
 
 
