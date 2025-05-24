@@ -11,7 +11,6 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
-import fr.ut1.m2ipm.dafumarket.mappers.MagasinMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
@@ -20,15 +19,10 @@ import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import jakarta.activation.DataSource;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -38,16 +32,11 @@ import java.time.ZoneId;
 import java.util.*;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 
@@ -266,7 +255,7 @@ public class ClientService {
             double totalSansPromo = 0;
 
             for (LignePanierDTO ligne : commandeDTO.getPanier().getLignes()) {
-                String produit = ligne.getNomProduit();
+                String produit = ligne.getNom();
                 int quantite = ligne.getQuantite();
                 double prixUnitaire = ligne.getPrixMagasin();
                 double prixAvecPromo = ligne.getPrixAvecPromo();
