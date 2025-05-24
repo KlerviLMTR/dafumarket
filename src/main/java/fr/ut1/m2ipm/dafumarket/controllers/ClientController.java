@@ -7,6 +7,8 @@ import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,9 +76,11 @@ public class ClientController {
             @RequestBody ConfirmationPanierRequest body
     ) {
         OffsetDateTime creneau = body.getCreneauHoraire();
+        int idMagasinChoisi = body.getIdMagasin();
         if (creneau!=null){
-            CommandeDTO p = this.clientService.confirmerCommande(idClient, creneau);
-            return ResponseEntity.ok(p);
+
+            CommandeDTO c = this.clientService.confirmerCommande(idClient, idMagasinChoisi,  creneau);
+            return ResponseEntity.ok(c);
         }
         else{
             return ResponseEntity.badRequest().build();

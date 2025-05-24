@@ -11,7 +11,10 @@ import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,6 +32,7 @@ public class ClientService {
     private final PropositionProduitDAO propositionDAO ;
     private final CommandeDAO commandeDAO ;
     private final CommandeMapper commandeMapper ;
+
 
     public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, PropositionProduitDAO propositionDAO, CommandeDAO commandeDAO, CommandeMapper commandeMapper) {
         this.clientDao = clientDao;
@@ -133,6 +137,7 @@ public class ClientService {
             PanierDTO panierDTO = panier.get();
             // Recuperer l'id du magasin associé au panier
             int idMagasin = panierDTO.getLignes().getFirst().getIdMagasin();
+            System.out.println(idMagasin);
             StockPanierMagasinDTO res = this.verifierStockMagasinPourUnPanier(panierDTO, idMagasin);
 
             System.out.println( "Voulus:"+res.getNbProduitsVoulus());
@@ -189,6 +194,7 @@ public class ClientService {
                 }
             }
         }
+
         boolean isPanierComplet = nombresDeMatchs == panierDTO.getLignes().size() && nombreDeProduitsVoulus == nombreDeProduitsVoulusEnStock;
 
 
@@ -202,12 +208,35 @@ public class ClientService {
      * - Cree la commande associée au panier avec le bon créneau horaire
      * @param idClient
      */
-    public CommandeDTO confirmerCommande(long idClient, OffsetDateTime creneau) {
-        // 1. Récuperer le panier en cours
+    public CommandeDTO confirmerCommande(long idClient, int idMagasin, OffsetDateTime creneau){
+
+            // 1. Récuperer le panier en cours
         Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
         if(panierDb.isPresent()) {
+
+            // Verifier les id panier + magasin.
             Panier panier = panierDb.get();
-            this.mettreAJourLePanierAvecStocksDisponibles(panier);
+            // Premier cas: le panier correspond bien au magasin confirmé par le client --> Workflow normal
+            if(panier.getLignes().get(0).getProposition().getMagasin().getIdMagasin() == idMagasin) {
+                this.mettreAJourLePanierAvecStocksDisponibles(panier);
+            }
+            else{
+                this.convertirPanierAvecStocksNouveauMagasin(panier, idMagasin);
+                // Il faut récupérer le nouveau panier
+
+
+                Optional<Panier> optNouveau = this.clientDao.getActivePanierDbByIdClient(idClient);
+                if(optNouveau.isPresent()) {
+                    Panier nouveau = optNouveau.get();
+                    // Reverifier les stocks + mettre à jour le ca
+                    this.mettreAJourLePanierAvecStocksDisponibles(nouveau);
+                }
+                else{
+                    throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
+                }
+
+
+            }
             // Une fois le panier et les stocks à jour, créer l'objet commande qui lui sera associé
 
 
@@ -223,6 +252,48 @@ public class ClientService {
         }
     }
 
+    private void convertirPanierAvecStocksNouveauMagasin(Panier panier, int idNouveauMagasin) {
+
+        PanierDTO panierDTO = this.panierMapper.toDto(panier);
+        Magasin ancienMagasin = panier.getLignes().getFirst().getProposition().getMagasin();
+        Magasin magasin = this.magasinDao.getMagasinDbModelById(idNouveauMagasin);
+        // Iterer dans le panier n°1 : pour chaque ligne, regarder si la proposition est dans le magasin cible
+        // Si oui : l'ajouter dans les mêmes quantités que le panier initial (stocks vérifiés après)
+        // Si non : ne rien faire
+
+        //Panier panierCible = new Panier();
+        // Mettre déjà toutes les infos nécessaires au panier
+        //panierCible.setClient(panier.getClient());
+        //Panier panieCible = this.clientDao.createPanier(panier.getClient().getIdClient());
+
+
+        for (AppartenirPanier ligne : panier.getLignes()) {
+            // verif proposition magasin 2: recuperer l'id du produit de la ligne
+            int idProduit = ligne.getProposition().getProduit().getIdProduit();
+
+            Optional<Proposition> optPropMag2  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idNouveauMagasin);
+            if (optPropMag2.isPresent()) {
+                //Si la prop est présente, ajouter la ligne au nouveau panier
+                Proposition propositionMag2 = optPropMag2.get();
+                this.panierDao.ajouterLigneProduitAuPanier(panier, propositionMag2, ligne.getQuantite());
+                //this.panierDao.supprimerLigneDuPanier(ligne, panier);
+            }
+            else{
+            }
+        }
+        try{
+            this.panierDao.supprimerLignesMagasin(ancienMagasin, panier);
+       }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+
+        // A la fin du parcours, supprimer l'ancien panier
+        //this.panierDao.supprimerPanier(panier);
+
+    }
+
     /**
      * Parcourt tout le panier. Pour chaque ligne, vérifie s'il y a du stock (étape 2/2 de la confirmation du magasin)
      * - Si aucun stock --> La ligne est supprimée du panier final
@@ -232,7 +303,7 @@ public class ClientService {
      */
     private Panier mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
         PanierDTO panierDTO = this.panierMapper.toDto(panierDb);
-        Magasin magasin = this.magasinDao.getMagasinDbModelById(panierDTO.getLignes().get(0).getIdMagasin());
+        Magasin magasin = this.magasinDao.getMagasinDbModelById(panierDTO.getLignes().getFirst().getIdMagasin());
         int idMagasin = magasin.getIdMagasin();
 
         Iterator<AppartenirPanier> it = panierDb.getLignes().iterator();
@@ -247,8 +318,6 @@ public class ClientService {
                 int stock = proposition.getStock();
                 int quantiteVoulue = lignePanier.getQuantite();
 
-                System.out.println("Stock : " + stock);
-                System.out.println("Quantite voulue: " + quantiteVoulue);
 
                 if(stock >= quantiteVoulue) {
                     // Alors on décrémente le stock de la quantité et on ne touche pas à la quantité commandée
@@ -259,8 +328,7 @@ public class ClientService {
                 else if(stock == 0){
                     // Dans ce cas pas possible d'avoir l'item commandé donc on supprime la ligne panier correspondante
                     String ligne = "idProduit:"+lignePanier.getProposition().getProduit().getIdProduit()+", idMagasin:"+idMagasin + ", idPanier:"+panierDb.getIdPanier();
-                    System.out.println("La ligne "+ lignePanier.getProposition().getProduit().getNom() + " ne peut être commandée car le stock est à 0");
-                    this.panierDao.supprimerLigneDuPanier(lignePanier, panierDb);
+                    //this.panierDao.supprimerLigneDuPanier(lignePanier, panierDb);
                     it.remove();
                 }
                 else {
@@ -289,7 +357,6 @@ public class ClientService {
         for (Magasin magasin : magasinsDb) {
 
             // Check ici le CA
-            System.out.println(magasin.getChiffreAffaires());
             cpt++;
 
             int idMagasin = magasin.getIdMagasin();

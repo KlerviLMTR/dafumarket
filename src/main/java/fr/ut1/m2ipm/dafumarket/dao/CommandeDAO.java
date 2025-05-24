@@ -11,7 +11,9 @@ import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.repositories.AppartenirPanierRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.CommandeRepository;
 import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,8 @@ import java.util.Optional;
 public class CommandeDAO {
     private final CommandeRepository commandeRepo;
     private final CommandeMapper commandeMapper;
+    @Autowired
+    private EntityManager em;
 
 
     public CommandeDAO(CommandeRepository commandeRepo, CommandeMapper commandeMapper) {
@@ -68,6 +72,8 @@ public class CommandeDAO {
         commande.setStatut(CommandeStatut.PAYE);
         commande.setPanier(panier);
         this.commandeRepo.save(commande);
+        em.flush();
+        em.clear();
         return commande;
     }
 

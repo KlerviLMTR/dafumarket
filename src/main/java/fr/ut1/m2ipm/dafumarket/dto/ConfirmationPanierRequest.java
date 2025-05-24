@@ -8,8 +8,13 @@ import java.time.OffsetDateTime;
 public class ConfirmationPanierRequest {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssX")
     private OffsetDateTime creneauHoraire;
+    private int idMagasin;
     public OffsetDateTime getCreneauHoraire() { return creneauHoraire; }
     public void setCreneauHoraire(OffsetDateTime creneauHoraire) {
         this.creneauHoraire = creneauHoraire;
+    }
+    public int getIdMagasin() { return idMagasin; }
+    public void setIdMagasin(int idMagasin) {
+        this.idMagasin = idMagasin;
     }
 }

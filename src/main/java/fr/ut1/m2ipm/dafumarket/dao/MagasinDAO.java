@@ -110,7 +110,6 @@ public class MagasinDAO {
 
     public List<ProduitProposeDTO> getAllProduitsProposesMagasin(int idMagasin) {
         List<ProduitProposeDTO> produitsProposesDTO = new ArrayList<>();
-        System.out.println("Debut recherche produits");
         Magasin magasin = this.magasinRepo.findById(idMagasin)
                 .orElseThrow(() -> new NoSuchElementException("Magasin non trouvé"));
         System.out.println("Magasin : " + magasin);
