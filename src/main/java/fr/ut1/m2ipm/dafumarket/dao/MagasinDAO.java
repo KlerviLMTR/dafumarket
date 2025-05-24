@@ -45,6 +45,10 @@ public class MagasinDAO {
 
     }
 
+    public List<Magasin> getAllMagasin() {
+        return magasinRepo.findAll();
+    }
+
     public List<MagasinDTO> getAllMagasinsAvecNombreProduits() {
         List<Magasin> magasins = magasinRepo.findAll();
         List<Object[]> resultats = propositionRepo.countProduitsParMagasin();

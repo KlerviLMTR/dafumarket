@@ -6,6 +6,7 @@ import fr.ut1.m2ipm.dafumarket.models.Magasin;
 public class MagasinMapper {
 
     public static MagasinDTO toDto(Magasin magasin, long countProduitsProposes) {
+
         return new MagasinDTO(
                 magasin.getIdMagasin(),
                 magasin.getNom(),
@@ -14,6 +15,7 @@ public class MagasinMapper {
                 magasin.getVille(),
                 magasin.getCp(),
                 magasin.getCoordonneesGps(),
+                magasin.getChiffreAffaires(),
                 countProduitsProposes
         );
     }

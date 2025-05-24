@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ClientService {
@@ -134,7 +131,9 @@ public class ClientService {
 
         if(panier.isPresent()) {
             PanierDTO panierDTO = panier.get();
-            StockPanierMagasinDTO res = this.verifierStockMagasinPourUnPanier(panierDTO);
+            // Recuperer l'id du magasin associé au panier
+            int idMagasin = panierDTO.getLignes().getFirst().getIdMagasin();
+            StockPanierMagasinDTO res = this.verifierStockMagasinPourUnPanier(panierDTO, idMagasin);
 
             System.out.println( "Voulus:"+res.getNbProduitsVoulus());
             System.out.println("Commandables ici : "+res.getNbProduitsCommandables() );
@@ -145,8 +144,13 @@ public class ClientService {
                 message.addMagasin(res);
             }
             else{
-                return new MessagePanierDTO("Certains produits ne sont pas disponibles. Vous pouvez choisir de poursuivre avec ce magasin ou en sélectionner un autre");
                 // Calculer les possibilités dans les autres magasins
+                List<StockPanierMagasinDTO> stocksAutresMags = this.calculerStocksAutresMagasinsPourUnPanier(panierDTO);
+                message = new MessagePanierDTO("Certains produits ne sont pas disponibles. Vous pouvez choisir de poursuivre avec ce magasin ou en sélectionner un autre");
+                for (StockPanierMagasinDTO stock : stocksAutresMags) {
+                    message.addMagasin(stock);
+                }
+                return message;
 
             }
         }
@@ -160,15 +164,13 @@ public class ClientService {
      * @param panierDTO
      * @return StockPanierMagasinDTO
      */
-    private StockPanierMagasinDTO verifierStockMagasinPourUnPanier(PanierDTO panierDTO) {
+    private StockPanierMagasinDTO verifierStockMagasinPourUnPanier(PanierDTO panierDTO, int idMagasin) {
         int nombreDeProduitsVoulus = 0;
         int nombreDeProduitsVoulusEnStock = 0;
         int nombresDeMatchs = 0;
 
+        Magasin m = this.magasinDao.getMagasinDbModelById(idMagasin);
 
-        // Recuperer l'id du magasin associé au panier
-        int idMagasin = panierDTO.getLignes().getFirst().getIdMagasin();
-        Magasin m = new Magasin();
         for (LignePanierDTO lignePanier: panierDTO.getLignes()){
             //Compter ce que veut le client
             int quantiteVoulue = lignePanier.getQuantite();
@@ -179,7 +181,7 @@ public class ClientService {
             Optional <Proposition> optProposition  = this.propositionDAO.getPropositionByIdProduitAndIdMagasin(idProduit, idMagasin);
             if (optProposition.isPresent()) {
                 Proposition proposition = optProposition.get();
-                m = proposition.getMagasin();
+
                 int stockMagasin = proposition.getStock();
                 if (stockMagasin > quantiteVoulue) {
                     nombresDeMatchs++;
@@ -188,15 +190,10 @@ public class ClientService {
             }
         }
         boolean isPanierComplet = nombresDeMatchs == panierDTO.getLignes().size() && nombreDeProduitsVoulus == nombreDeProduitsVoulusEnStock;
-        System.out.println("NombresDeMatchs : " + nombresDeMatchs);
-        System.out.println(isPanierComplet);
+
 
        return new StockPanierMagasinDTO(m, nombreDeProduitsVoulusEnStock,nombreDeProduitsVoulus, panierDTO.getLignes().size(), nombresDeMatchs,isPanierComplet);
-
-
     }
-
-
 
 
     /**
@@ -281,6 +278,29 @@ public class ClientService {
         this.magasinDao.mettreAJourCAMagasin(magasin, panierFinal.getTotalCost());
         return panierDb;
     }
+
+    private List<StockPanierMagasinDTO> calculerStocksAutresMagasinsPourUnPanier(PanierDTO panier) {
+       // Recuperer les id de tous les autres magasins
+        int cpt =0;
+
+        List<Magasin> magasinsDb = magasinDao.getAllMagasin();
+        List<StockPanierMagasinDTO> stocksAutresMagasins = new ArrayList<StockPanierMagasinDTO>();
+
+        for (Magasin magasin : magasinsDb) {
+
+            // Check ici le CA
+            System.out.println(magasin.getChiffreAffaires());
+            cpt++;
+
+            int idMagasin = magasin.getIdMagasin();
+            StockPanierMagasinDTO capaciteMagasin = this.verifierStockMagasinPourUnPanier(panier, idMagasin);
+            stocksAutresMagasins.add(capaciteMagasin);
+        }
+        return stocksAutresMagasins;
+
+    }
+
+
 
 
 
