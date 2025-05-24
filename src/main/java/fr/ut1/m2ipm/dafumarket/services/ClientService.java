@@ -235,7 +235,8 @@ public class ClientService {
      */
     private Panier mettreAJourLePanierAvecStocksDisponibles(Panier panierDb) {
         PanierDTO panierDTO = this.panierMapper.toDto(panierDb);
-        int idMagasin = panierDTO.getLignes().get(0).getIdMagasin();
+        Magasin magasin = this.magasinDao.getMagasinDbModelById(panierDTO.getLignes().get(0).getIdMagasin());
+        int idMagasin = magasin.getIdMagasin();
 
         Iterator<AppartenirPanier> it = panierDb.getLignes().iterator();
         while (it.hasNext()) {
@@ -274,6 +275,10 @@ public class ClientService {
                 }
             }
         }
+        // Mettre à jour le chiffre d'affaires du magasin avec le montant payé de la commande
+        // Recalculer les totaux
+        PanierDTO panierFinal = this.panierMapper.toDto(panierDb);
+        this.magasinDao.mettreAJourCAMagasin(magasin, panierFinal.getTotalCost());
         return panierDb;
     }
 
