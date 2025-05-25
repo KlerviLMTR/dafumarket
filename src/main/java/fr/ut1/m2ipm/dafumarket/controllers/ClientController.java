@@ -104,7 +104,7 @@ public class ClientController {
 
 
     @GetMapping("/convertirPanier")
-    public ResponseEntity<PanierDTO> verifierPanier(@RequestParam int idMagasin) {
+    public ResponseEntity<PanierDTO> convertirPanier(@RequestParam int idMagasin) {
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         PanierDTO p =  this.clientService.convertirPanierMagasin(client.getIdClient(), idMagasin);
