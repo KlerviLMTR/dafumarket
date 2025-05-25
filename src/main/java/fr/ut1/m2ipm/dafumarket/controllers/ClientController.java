@@ -98,6 +98,7 @@ public class ClientController {
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         MessagePanierDTO m = this.clientService.verifierPanier(client.getIdClient());
+        System.out.println(m.getMessage());
         return ResponseEntity.ok(m);
     }
 
@@ -115,6 +116,12 @@ public class ClientController {
             return ResponseEntity.badRequest().build();
 
         }
+    }
+
+    @GetMapping("/testsgps/{idClient}/{idCommande}")
+    public ResponseEntity testsGps(@PathVariable int idClient , @PathVariable int idCommande){
+        this.clientService.sendRecapitulatif(idClient, idCommande);
+        return ResponseEntity.ok().build();
     }
 
 

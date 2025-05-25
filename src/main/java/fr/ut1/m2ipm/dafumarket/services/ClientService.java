@@ -15,6 +15,7 @@ import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.activation.DataSource;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
@@ -28,6 +29,8 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -40,6 +43,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.util.UriUtils;
 
 
 @Service
@@ -147,6 +151,51 @@ public class ClientService {
             Client client = this.clientDao.getClientById(idClient);
             byte[] pdfBytes = createPdfCommande(commandeId, client);
 
+            Dotenv dotenv = Dotenv.load();
+            String apiKey = dotenv.get("GOOGLE_API_KEY");
+
+
+
+            Commande commande = commandeDao.getCommandeDbByID((int) commandeId);
+            Magasin magasin = commande.getPanier().getLignes().getFirst().getProposition().getMagasin();
+
+            String adresseClient = client.getAdresse()
+                    + " " + client.getCp()
+                    + " " + client.getVille();
+            String origine = URLEncoder.encode(adresseClient, StandardCharsets.UTF_8);
+
+            double lat = Double.parseDouble(magasin.getCoordonneesGps().split(",")[0]);
+            double lng = Double.parseDouble(magasin.getCoordonneesGps().split(",")[1]);
+            String destination = String.format(Locale.US, "%.6f,%.6f", lat, lng);
+
+            String rawPath = String.format(
+                    "weight:5|color:blue|%f,%f|%f,%f",
+                    lat, lng,
+                    lat, lng
+            );
+            String encodedPath = UriUtils.encode(rawPath, StandardCharsets.UTF_8);
+
+            String staticMapUrl = String.format(
+                    "https://maps.googleapis.com/maps/api/staticmap"
+                            + "?size=600x300"
+                            + "&path=%s"
+                            + "&markers=color:red|%f,%f"
+                            + "&markers=color:green|%f,%f"
+                            + "&key=%s",
+                    encodedPath,
+                    lat, lng,
+                    lat, lng,
+                    apiKey
+            );
+
+            String mapsUrl = String.format(
+                    "https://www.google.com/maps/dir/?api=1"
+                            + "&origin=%s"
+                            + "&destination=%s"
+                            + "&travelmode=driving",
+                    origine, destination
+            );
+
             if (pdfBytes == null) {
                 System.out.println("PDF non généré, email non envoyé.");
                 return;
@@ -155,20 +204,100 @@ public class ClientService {
             DataSource dataSource = new ByteArrayDataSource(pdfBytes, "application/pdf");
 
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED);
 
 
             helper.setTo(client.getEmail());
             helper.setSubject("Dafu Market : facture pour la Commande #" + commandeId);
-            Commande commande = this.commandeDao.getCommandeDbByID((int) commandeId);
             CommandeDTO commandeDTO = this.commandeMapper.toDto(commande);
             String date = commandeDTO.getDateHeureRetrait().toString();
 
-            helper.setText("Bonjour " + client.getPrenom() + "\n\nVotre facture du " + date + " pour la commande #" + commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
-                    "\n\nCordialement,\nL'équipe Dafu Market");
+           // ClassPathResource logo = new ClassPathResource("static/logo_dafu.png");
+            //helper.addInline("logoCid", logo, "image/png");
 
+            String html = """
+                <html>
+                  <body style="font-family: Arial, sans-serif; background-color: #F8F5F5; margin:0; padding:0;">
+                    <!-- header -->
+                       <div style="text-align:center; background-color:white; margin-bottom:30px;">
+                                          <h1 style="
+                                               margin:0;
+                                               font-size:28px;
+                                               color:#0a3175;
+                                               line-height:1.2;
+                                               ">
+                                            Merci pour votre commande<br/>chez DafuMarket !
+                                          </h1>
+                                          <div style="
+                                               width:80px;
+                                               height:4px;
+                                               background:#b41967;
+                                               margin:8px auto 0;
+                                               border-radius:2px;
+                                               ">
+                                          </div>
+                       </div>
+                        
+            
+                    <!-- corps du mail -->
+                    <div style="max-width:600px; margin:30px auto; background-color:#ffffff; 
+                                border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px;">
+                      
+                      <h1 style="font-size:24px; color:#333333; margin-bottom:10px;">
+                        Bonjour %s,
+                      </h1>
+            
+                      <p style="font-size:16px; color:#555555; line-height:1.5;">
+                        Votre facture du <strong>%s</strong> pour la commande 
+                        <strong>#%d</strong> est disponible en pièce jointe.
+                      </p>
+            
+                      <hr style="border:none; border-top:1px solid #eeeeee; margin:20px 0;" />
+            
+                      <p style="font-size:16px; color:#555555;">
+                        Pour rejoindre notre magasin, cliquez sur l’image ou le lien ci-dessous :
+                      </p>
+            
+                      <div style="text-align:center; margin:20px 0;">
+                        <a href="%s" target="_blank" style="text-decoration:none;">
+                          <img src="%s" 
+                               alt="Itinéraire vers le magasin" 
+                               style="width:100%%; max-width:500px; border-radius:4px;"/>
+                        </a>
+                      </div>
+            
+                      <p style="text-align:center; margin-bottom:20px;">
+                        <a href="%s" target="_blank" 
+                           style="display:inline-block; padding:10px 20px; background-color:#004aad; 
+                                  color:#ffffff; border-radius:4px; text-decoration:none; font-weight:bold;">
+                          Voir l’itinéraire sur Google Maps
+                        </a>
+                      </p>
+            
+                      <p style="font-size:14px; color:#777777; line-height:1.5;">
+                        Merci de faire confiance à Dafu Market pour vos courses en drive.<br/>
+                        À très bientôt !<br/><br/>
+                        <em>L’équipe Dafu Market</em>
+                      </p>
+                    </div>
+            
+                    <!-- footer -->
+                    <div style="text-align:center; font-size:12px; color:#aaaaaa; padding:10px;">
+                      © 2025 Dafu Market – Tous droits réservés
+                    </div>
+                  </body>
+                </html>
+                """.formatted(
+                                client.getPrenom(),
+                                date,
+                                commandeDTO.getIdCommande(),
+                                mapsUrl,
+                                staticMapUrl,
+                                mapsUrl
+                        );
+
+            helper.setText(html, true);
             helper.addAttachment("facture.pdf", dataSource);
-
             mailSender.send(message);
 
         } catch (Exception e) {
