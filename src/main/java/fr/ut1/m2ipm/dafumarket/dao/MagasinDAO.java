@@ -36,9 +36,10 @@ public class MagasinDAO {
     private final CommandeRepository commandeRepo;
     private final CommandeMapper commandeMapper;
     private final RayonRepository rayonRepo;
+    private final AssocierPromoRepository promoRepo;
 
     public MagasinDAO(MagasinRepository magasinRepo,
-                      PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper, RayonRepository rayonRepo) {
+                      PropositionRepository propositionRepo, PropositionProduitDAO propositionDAO, AssocierPromoRepository associerPromoRepository, ProduitRepository produitRepo, CommandeRepository commandeRepo , CommandeMapper commandeMapper, RayonRepository rayonRepo, AssocierPromoRepository promoRepo) {
         this.magasinRepo = magasinRepo;
         this.propositionRepo = propositionRepo;
         this.propositionDAO = propositionDAO;
@@ -47,6 +48,7 @@ public class MagasinDAO {
         this.rayonRepo = rayonRepo;
         this.commandeRepo = commandeRepo;
         this.commandeMapper = commandeMapper;
+        this.promoRepo = promoRepo;
 
     }
 
@@ -243,5 +245,37 @@ public class MagasinDAO {
         double nouveauCA = magasin.getChiffreAffaires() + montant;
         magasin.setChiffreAffaires(nouveauCA);
         magasinRepo.save(magasin);
+    }
+
+    public List<ProduitProposeDTO> getAllProduitsProposesByMarque(
+            int idMagasin,
+            String marque
+    ) {
+        List<ProduitProposeDTO> result = new ArrayList<>();
+
+        List<Proposition> propositions = propositionRepo.findByMagasin_IdMagasinAndProduit_Marque_Nom(idMagasin, marque);
+
+        for (Proposition p : propositions) {
+            Optional<AssocierPromo> optAssoc = associerPromoRepository
+                    .findActiveByProduitAndMagasin(
+                            p .getProduit().getIdProduit(),
+                            p .getMagasin().getIdMagasin()
+                    );
+
+            Promotion promo = optAssoc
+                    .map(AssocierPromo::getPromotion)
+                    .orElse(null);
+
+            System.out.println(promo);
+
+            if(promo != null){
+                System.out.println(promo);
+            }
+            // ProduitProposeMapper doit prendre Proposition + Promotion
+            ProduitProposeDTO dto = ProduitProposeMapper.toDto(p, promo);
+            result.add(dto);
+        }
+
+        return result;
     }
 }
