@@ -4,9 +4,11 @@ package fr.ut1.m2ipm.dafumarket.dao;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ListeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
+import fr.ut1.m2ipm.dafumarket.dto.PostItDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.PostItMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityManager;
@@ -145,7 +147,7 @@ public class ClientDAO {
 
 
     @Transactional
-    public ListeDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
+    public PostItDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
         PostIt postIt = new PostIt();
         postIt.setContenu(saisie);
         postIt.setTitre(titre);
@@ -159,8 +161,20 @@ public class ClientDAO {
         postItRepository.save(postIt);
 
 
-        return ListeMapper.toDto(liste);
+        return PostItMapper.toDto(postIt);
     }
 
+    public PostItDTO modifierPostIt(int idPostit, String saisie) {
+        int updated = postItRepository.updateContenuById(idPostit, saisie);
+        if (updated == 0) {
+            throw new EntityNotFoundException("PostIt #" + idPostit + " introuvable");
+        }
+        PostIt p = this.postItRepository.getById(idPostit);
+        return PostItMapper.toDto(p);
+    }
+
+    public void supprimerPostIt(int idPostit) {
+        this.postItRepository.deleteById(idPostit);
+    }
 }
 

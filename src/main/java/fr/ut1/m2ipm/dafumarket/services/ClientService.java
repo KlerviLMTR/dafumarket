@@ -389,7 +389,15 @@ public class ClientService {
         return this.clientDao.getListeById(idClient, idListe);
     }
 
-    public ListeDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
+    public PostItDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
         return this.clientDao.creerPostIt(idClient, idListe, saisie, titre);
+    }
+
+    public PostItDTO modifierPostIt(int idPostit , String saisie) {
+        return this.clientDao.modifierPostIt(idPostit, saisie);
+    }
+
+    public void supprimerPostit(int idPostit) {
+        this.clientDao.supprimerPostIt(idPostit);
     }
 }
