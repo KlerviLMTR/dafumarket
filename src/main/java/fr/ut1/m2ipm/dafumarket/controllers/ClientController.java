@@ -114,6 +114,9 @@ public class ClientController {
         return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
     }
 
+
+    // Postits
+
     @PostMapping("/{idClient}/postits/{idListe}")
     public PostItDTO creerPostIt(
             @PathVariable long idClient,
@@ -128,7 +131,6 @@ public class ClientController {
         );
     }
 
-    // Postits
     @PatchMapping("/{idClient}/postits/{idPostit}")
     public PostItDTO modifierPostIt ( @PathVariable int idPostit , @RequestBody String saisie) {
        return  this.clientService.modifierPostIt( idPostit, saisie);
@@ -139,7 +141,6 @@ public class ClientController {
         this.clientService.supprimerPostit(idPostit);
         return ResponseEntity.noContent().build();
     }
-
 
 
     @PostMapping("/{idClient}/test-mistral")
