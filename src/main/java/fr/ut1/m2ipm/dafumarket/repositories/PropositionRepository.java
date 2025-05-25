@@ -47,4 +47,8 @@ public interface PropositionRepository extends JpaRepository<Proposition, Propos
 
     List<Proposition> findAllByMagasin_IdMagasin(Integer idMagasin);
 
-}
+
+    List<Proposition> findByMagasin_IdMagasinAndProduit_Marque_Nom(
+            int idMagasin,
+            String nomMarque
+    );}

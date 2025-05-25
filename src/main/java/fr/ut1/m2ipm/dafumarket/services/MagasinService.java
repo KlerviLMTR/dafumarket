@@ -97,4 +97,8 @@ public class MagasinService {
     public List<ProduitProposeDTO> getAllProduitsProposesMagasinCategorie(int idMagasin, int idRayon) {
         return this.magasinDAO.getAllProduitsProposesMagasinCategorie(idMagasin, idRayon);
     }
+
+    public List<ProduitProposeDTO> getProduitsProposesMagasinByMarque(int idMagasin, String marque) {
+        return this.magasinDAO.getAllProduitsProposesByMarque(idMagasin, marque);
+    }
 }

@@ -116,6 +116,15 @@ public class ProduitDAO {
     }
 
 
+    public  List<ProduitDTO> getProduitByMarque(String marque) {
+        // Chercher la marque
+        List<Produit> produits = this.produitRepository.findByMarqueNom(marque);
+        List<ProduitDTO> produitDTOs = new ArrayList<>();
+        for (Produit produit : produits) {
+            produitDTOs.add(ProduitMapper.toDto(produit));
+        }
 
+        return produitDTOs;
 
+    }
 }
