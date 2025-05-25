@@ -38,6 +38,7 @@ public class AuthenticationService {
         Compte compte = new Compte();
         compte.setLogin(input.getEmail());
         compte.setPassword(passwordEncoder.encode(input.getPassword()));
+        System.out.println("NUMERO: "+ input.getNumero());
 
         Compte c = compteRepository.save(compte);
 
@@ -48,7 +49,7 @@ public class AuthenticationService {
         client.setCp(input.getCp());
         client.setAdresse(input.getAdresse());
         client.setVille(input.getVille());
-        client.setNumero(input.getTelephone());
+        client.setNumero(input.getNumero());
 
         client.setCompte(c);
 

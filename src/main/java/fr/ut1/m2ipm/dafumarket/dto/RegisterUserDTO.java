@@ -6,7 +6,7 @@ public class RegisterUserDTO {
     private String nom;
     private String prenom;
     private String adresse;
-    private String telephone;
+    private String numero;
     private String cp;
     private String ville;
 
@@ -50,12 +50,12 @@ public class RegisterUserDTO {
         this.adresse = adresse;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getNumero() {
+        return numero;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setNumero(String numero) {
+        this.numero = numero;
     }
 
     public String getCp() {
