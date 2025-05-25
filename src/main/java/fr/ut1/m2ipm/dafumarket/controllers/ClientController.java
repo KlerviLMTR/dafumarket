@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,9 +48,11 @@ public class ClientController {
      *
      * @return List<CommandeDTO>
      */
-    @GetMapping("/{idClient}/commandes")
-    public List<CommandeDTO> getToutesLesCommandes(@PathVariable long idClient) {
-        return this.clientService.getAllCommandesByIdClient(idClient);
+    @GetMapping("/commandes")
+    public List<CommandeDTO> getToutesLesCommandes() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.getAllCommandesByIdClient(client.getIdClient());
     }
 
 
@@ -63,6 +66,7 @@ public class ClientController {
 
     @PostMapping("/panier")
     public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
+        System.out.println("PANIER");
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(client.getIdClient(), idProduit, quantite, idMagasin);
@@ -87,6 +91,30 @@ public class ClientController {
         Client client = clientDAO.getClientByCompte(compte);
         clientService.supprimerPanier(client.getIdClient());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/verifierPanier")
+    public ResponseEntity<MessagePanierDTO> verifierPanier() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        MessagePanierDTO m = this.clientService.verifierPanier(client.getIdClient());
+        return ResponseEntity.ok(m);
+    }
+
+    @PostMapping("/confirmerCommande")
+    public ResponseEntity<CommandeDTO> confirmerCommande(@RequestBody ConfirmationPanierRequest body) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        OffsetDateTime creneau = body.getCreneauHoraire();
+        int idMagasinChoisi = body.getIdMagasin();
+        if (creneau != null) {
+
+            CommandeDTO c = this.clientService.confirmerCommande(client.getIdClient(), idMagasinChoisi, creneau);
+            return ResponseEntity.ok(c);
+        } else {
+            return ResponseEntity.badRequest().build();
+
+        }
     }
 
 
