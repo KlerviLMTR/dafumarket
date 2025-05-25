@@ -2,11 +2,9 @@ package fr.ut1.m2ipm.dafumarket.controllers;
 
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dto.ClientDTO;
+import fr.ut1.m2ipm.dafumarket.dto.ListeDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.ClientMapper;
-import fr.ut1.m2ipm.dafumarket.models.Client;
-import fr.ut1.m2ipm.dafumarket.models.Commande;
-import fr.ut1.m2ipm.dafumarket.models.Compte;
-import fr.ut1.m2ipm.dafumarket.models.Panier;
+import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
@@ -91,6 +89,32 @@ public class ClientController {
         clientService.supprimerPanier(idClient);
         return ResponseEntity.noContent().build();
     }
+
+
+    // Listes + postits
+
+    @GetMapping("/{idClient}/listes")
+    public List<ListeDTO> getAllListsClient(@PathVariable int idClient) {
+        return this.clientService.getAllListes(idClient);
+    }
+
+    @GetMapping("/{idClient}/listes/{idListe}")
+    public ListeDTO getListByIdClient(@PathVariable long idClient, @PathVariable long idListe) {
+        return this.clientService.getListeById(idClient, idListe);
+    }
+
+
+    @PostMapping("/{idClient}/listes")
+    public Liste creerListeCourses(@PathVariable int idClient, @RequestBody String titreListe) {
+        return this.clientService.creerListeCourses(titreListe, idClient);
+    }
+
+
+    @PostMapping("/{idClient}/postits/{idPostit}")
+    public ResponseEntity<Map<String, Object>> genererListeLLM(@RequestBody String phrase) {
+        return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
+    }
+
 
     @PostMapping("/{idClient}/test-mistral")
     public ResponseEntity<Map<String, Object>> appelLLM(@RequestBody String phrase) {

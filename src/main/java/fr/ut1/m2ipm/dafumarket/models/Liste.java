@@ -23,6 +23,10 @@ public class Liste {
     @OneToMany(mappedBy = "liste", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AppartenirListe> items;
 
+    @OneToMany(mappedBy = "liste", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostIt> postIts;
+
+
     public Liste(Client client, String nom) {
         this.client = client;
         this.nom = nom;
@@ -58,5 +62,12 @@ public class Liste {
     }
     public void setItems(Set<AppartenirListe> items) {
         this.items = items;
+    }
+
+    public Set<PostIt> getPostIts() {
+        return postIts;
+    }
+    public void setPostIts(Set<PostIt> postIts) {
+        this.postIts = postIts;
     }
 }

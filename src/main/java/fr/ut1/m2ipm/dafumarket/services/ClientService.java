@@ -16,6 +16,7 @@ import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
+import fr.ut1.m2ipm.dafumarket.models.Liste;
 import fr.ut1.m2ipm.dafumarket.models.Panier;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
@@ -24,6 +25,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -377,4 +379,16 @@ public class ClientService {
     }
 
 
+    public Liste creerListeCourses(String titreListe, int idClient)
+    {
+        return this.clientDao.creerListeCourses(titreListe,  idClient);
+    }
+
+    public List<ListeDTO> getAllListes(int idClient) {
+        return this.clientDao.getAllListes(idClient);
+    }
+
+    public ListeDTO getListeById(long idClient, long idListe) {
+        return this.clientDao.getListeById(idClient, idListe);
+    }
 }

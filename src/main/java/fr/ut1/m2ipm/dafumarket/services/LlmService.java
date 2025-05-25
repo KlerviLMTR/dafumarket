@@ -127,6 +127,9 @@ public class LlmService {
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
         List<Map<String, Integer>> produits = new ArrayList<>();
         for (JsonNode p : contentJson.path("produitsSelectionnes")) {
+            System.out.println("LOGS ICI MISTRAL");
+            System.out.println(p);
+            System.out.println(p.path("idProduit"));
             produits.add(Map.of(
                     "idProduit", p.path("idProduit").asInt(),
                     "quantite", p.path("quantite").asInt()
@@ -139,6 +142,11 @@ public class LlmService {
                 "promptEnvoye", promptEnvoye,
                 "reponseBrute", contentJsonString
         );
+    }
+
+
+    public void ajouterProduitListe(int idProduit, int idListe){
+
     }
 
     public Map<String, List<ProduitDTO>> trouverProduitsSimilaires(List<ProduitDTO> produits, List<String> ingredients) {
