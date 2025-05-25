@@ -44,6 +44,7 @@ public class AuthenticationService {
         Client client = new Client();
         client.setNom(input.getNom());
         client.setPrenom(input.getPrenom());
+        client.setEmail(input.getEmail());
         client.setCp(input.getCp());
         client.setAdresse(input.getAdresse());
         client.setVille(input.getVille());
