@@ -44,7 +44,8 @@ public class ClientController {
 
     /**
      * Recupere et renvoie les commandes correspondant à l'id du client fourni
-     * @return  List<CommandeDTO>
+     *
+     * @return List<CommandeDTO>
      */
     @GetMapping("/{idClient}/commandes")
     public List<CommandeDTO> getToutesLesCommandes(@PathVariable long idClient) {
@@ -52,98 +53,99 @@ public class ClientController {
     }
 
 
-    @GetMapping("/{idClient}")
-    public Client getClient(@PathVariable long idClient) {
-        return this.clientService.getClient(idClient);
-    }
-
-    @GetMapping("/{idClient}/panier")
-    public Optional<PanierDTO> getActivePanierByIdClient(@PathVariable long idClient) {
-        return this.clientService.getActivePanierByIdClient(idClient);
+    @GetMapping("/panier")
+    public Optional<PanierDTO> getActivePanierByIdClient() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.getActivePanierByIdClient(client.getIdClient());
     }
 
 
-    @PostMapping("/{idClient}/panier")
-    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@PathVariable long idClient,
-                                                            @RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
-        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(idClient, idProduit, quantite,idMagasin);
-        if(panierDTO.isPresent()) {
+    @PostMapping("/panier")
+    public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(client.getIdClient(), idProduit, quantite, idMagasin);
+        if (panierDTO.isPresent()) {
             return ResponseEntity.ok(panierDTO);
-        }
-        else{
+        } else {
             return ResponseEntity.noContent().build();
         }
 
     }
 
-    @PostMapping("/{idClient}/{commandeId}")
-    public void sendRecapitulatif(@PathVariable long idClient, @PathVariable long commandeId) {
-        this.clientService.sendRecapitulatif(idClient, commandeId);
+    @PostMapping("/commandes/{commandeId}")
+    public void sendRecapitulatif(@PathVariable long commandeId) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        this.clientService.sendRecapitulatif(client.getIdClient(), commandeId);
     }
 
-    @DeleteMapping("/{idClient}/panier")
-    public ResponseEntity<Void> supprimerPanier(@PathVariable long idClient) {
-        clientService.supprimerPanier(idClient);
+    @DeleteMapping("/panier")
+    public ResponseEntity<Void> supprimerPanier() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        clientService.supprimerPanier(client.getIdClient());
         return ResponseEntity.noContent().build();
     }
 
 
     // Listes + postits
 
-    @GetMapping("/{idClient}/listes")
-    public List<ListeDTO> getAllListsClient(@PathVariable int idClient) {
-        return this.clientService.getAllListes(idClient);
+    @GetMapping("/listes")
+    public List<ListeDTO> getAllListsClient() {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.getAllListes(client.getIdClient());
     }
 
-    @GetMapping("/{idClient}/listes/{idListe}")
-    public ListeDTO getListByIdClient(@PathVariable long idClient, @PathVariable long idListe) {
-        return this.clientService.getListeById(idClient, idListe);
+    @GetMapping("/listes/{idListe}")
+    public ListeDTO getListByIdClient(@PathVariable long idListe) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.getListeById(client.getIdClient(), idListe);
     }
 
 
-    @PostMapping("/{idClient}/listes")
-    public Liste creerListeCourses(@PathVariable int idClient, @RequestBody String titreListe) {
-        return this.clientService.creerListeCourses(titreListe, idClient);
+    @PostMapping("/listes")
+    public Liste creerListeCourses(@RequestBody String titreListe) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.creerListeCourses(titreListe, client.getIdClient());
     }
 
 
-
-
-    @GetMapping("/{idClient}/postits/{idPostit}/llm")
+    @GetMapping("/postits/{idPostit}/llm")
     public ResponseEntity<ListeDTO> genererListeLLM(@PathVariable int idPostit) {
-        return ResponseEntity.ok(clientService.traiterDemandeLLM( idPostit));
+        return ResponseEntity.ok(clientService.traiterDemandeLLM(idPostit));
     }
 
 
     // Postits
 
-    @PostMapping("/{idClient}/postits/{idListe}")
+    @PostMapping("/postits/{idListe}")
     public PostItDTO creerPostIt(
-            @PathVariable long idClient,
             @PathVariable long idListe,
             @RequestBody PostitRequest request
     ) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
         return clientService.creerPostIt(
-                idClient,
+                client.getIdClient(),
                 idListe,
                 request.getSaisie(),
                 request.getTitre()
         );
     }
 
-    @PatchMapping("/{idClient}/postits/{idPostit}")
-    public PostItDTO modifierPostIt ( @PathVariable int idPostit , @RequestBody String saisie) {
-       return  this.clientService.modifierPostIt( idPostit, saisie);
+    @PatchMapping("/postits/{idPostit}")
+    public PostItDTO modifierPostIt(@PathVariable int idPostit, @RequestBody String saisie) {
+        return this.clientService.modifierPostIt(idPostit, saisie);
     }
 
-    @DeleteMapping("/{idClient}/postits/{idPostit}")
-    public ResponseEntity supprimerPostIt ( @PathVariable int idPostit) {
+    @DeleteMapping("/postits/{idPostit}")
+    public ResponseEntity supprimerPostIt(@PathVariable int idPostit) {
         this.clientService.supprimerPostit(idPostit);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 }
