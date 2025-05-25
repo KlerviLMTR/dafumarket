@@ -1,12 +1,9 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dto.ClientDTO;
-import fr.ut1.m2ipm.dafumarket.dto.ListeDTO;
+import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.ClientMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
-import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
-import fr.ut1.m2ipm.dafumarket.dto.PanierDTO;
 import fr.ut1.m2ipm.dafumarket.models.Client;
 
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
@@ -110,14 +107,33 @@ public class ClientController {
     }
 
 
-    @PostMapping("/{idClient}/postits/{idPostit}")
+
+
+    @PostMapping("/{idClient}/postits/{idPostit}/llm")
     public ResponseEntity<Map<String, Object>> genererListeLLM(@RequestBody String phrase) {
         return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
     }
+
+    @PostMapping("/{idClient}/postits/{idListe}")
+    public ListeDTO creerPostIt(
+            @PathVariable long idClient,
+            @PathVariable long idListe,
+            @RequestBody PostitRequest request
+    ) {
+        return clientService.creerPostIt(
+                idClient,
+                idListe,
+                request.getSaisie(),
+                request.getTitre()
+        );
+    }
+
 
 
     @PostMapping("/{idClient}/test-mistral")
     public ResponseEntity<Map<String, Object>> appelLLM(@RequestBody String phrase) {
         return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
     }
+
+
 }

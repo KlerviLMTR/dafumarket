@@ -14,10 +14,7 @@ import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
-import fr.ut1.m2ipm.dafumarket.models.Client;
-import fr.ut1.m2ipm.dafumarket.models.Commande;
-import fr.ut1.m2ipm.dafumarket.models.Liste;
-import fr.ut1.m2ipm.dafumarket.models.Panier;
+import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.activation.DataSource;
@@ -390,5 +387,9 @@ public class ClientService {
 
     public ListeDTO getListeById(long idClient, long idListe) {
         return this.clientDao.getListeById(idClient, idListe);
+    }
+
+    public ListeDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
+        return this.clientDao.creerPostIt(idClient, idListe, saisie, titre);
     }
 }

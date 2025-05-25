@@ -8,10 +8,7 @@ import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
-import fr.ut1.m2ipm.dafumarket.repositories.ClientRepository;
-import fr.ut1.m2ipm.dafumarket.repositories.CommandeRepository;
-import fr.ut1.m2ipm.dafumarket.repositories.ListeRepository;
-import fr.ut1.m2ipm.dafumarket.repositories.PanierRepository;
+import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -19,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,14 +34,16 @@ public class ClientDAO {
     private final CommandeMapper commandeMapper;
     private final CommandeRepository commandeRepository;
     private final ListeRepository listeRepository;
+    private final PostItRepository postItRepository;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em, ListeRepository listeRepository) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em, ListeRepository listeRepository, PostItRepository postItRepository) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
         this.commandeMapper = commandeMapper;
         this.commandeRepository = commandeRepository;
         this.listeRepository = listeRepository;
+        this.postItRepository = postItRepository;
         //this.em = em;
 
     }
@@ -115,7 +115,6 @@ public class ClientDAO {
         liste.setClient( getClientById(idClient) );
         liste.setNom(titreListe);
         listeRepository.save(liste);
-        System.out.println("COUCOU DAO");
         return liste;
     }
 
@@ -133,5 +132,35 @@ public class ClientDAO {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Liste " + listeId + " pour client " + clientId + " non trouvée"));
     }
+
+    public Liste getListeDbModelById(long clientId, long listeId) {
+        Optional<Liste> optList =  this.listeRepository.findByClientIdAndIdListeWithItemsAndPostIts(clientId, (int) listeId);
+        if (!optList.isPresent()) {
+            return null;
+
+        }
+        Liste liste = optList.get();
+        return liste;
+    }
+
+
+    @Transactional
+    public ListeDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
+        PostIt postIt = new PostIt();
+        postIt.setContenu(saisie);
+        postIt.setTitre(titre);
+        Liste liste = getListeDbModelById(idClient, idListe);
+        if (liste == null) {
+            throw new EntityNotFoundException("Liste non trouvée");
+        }
+        postIt.setListe(liste);
+        liste.getPostIts().add(postIt);
+
+        postItRepository.save(postIt);
+
+
+        return ListeMapper.toDto(liste);
+    }
+
 }
 
