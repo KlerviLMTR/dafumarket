@@ -591,19 +591,22 @@ public class ClientService {
             // Premier cas: le panier correspond bien au magasin confirmé par le client --> Workflow normal
             if (panier.getLignes().get(0).getProposition().getMagasin().getIdMagasin() == nouveauMagasin) {
                 // Alors ne rien faire (même magasin)
+                // Renvoyer le panier courant
+
             } else {
 
                 this.convertirPanierAvecStocksNouveauMagasin(panier, nouveauMagasin);
 
-                // Il faut récupérer le nouveau panier
-                Optional<Panier> optNouveau = this.clientDao.getActivePanierDbByIdClient(idClient);
-                if (optNouveau.isPresent()) {
-                    Panier nouveau = optNouveau.get();
-                    return panierMapper.toDto(nouveau);
-                } else {
-                    throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
-                }
 
+
+            }
+            // Il faut récupérer le nouveau panier
+            Optional<Panier> optNouveau = this.clientDao.getActivePanierDbByIdClient(idClient);
+            if (optNouveau.isPresent()) {
+                Panier nouveau = optNouveau.get();
+                return panierMapper.toDto(nouveau);
+            } else {
+                throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
             }
         }
         throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
