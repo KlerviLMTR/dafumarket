@@ -102,6 +102,18 @@ public class ClientController {
         return ResponseEntity.ok(m);
     }
 
+
+    @GetMapping("/convertirPanier")
+    public ResponseEntity<PanierDTO> verifierPanier(@RequestParam int idMagasin) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        PanierDTO p =  this.clientService.convertirPanierMagasin(client.getIdClient(), idMagasin);
+        System.out.println();
+        return ResponseEntity.ok(p);
+    }
+
+
+
     @PostMapping("/confirmerCommande")
     public ResponseEntity<CommandeDTO> confirmerCommande(@RequestBody ConfirmationPanierRequest body) {
         Compte compte = AuthUtils.getCurrentUser();
@@ -118,6 +130,9 @@ public class ClientController {
         }
     }
 
+
+
+
     @GetMapping("/testsgps/{idClient}/{idCommande}")
     public ResponseEntity testsGps(@PathVariable int idClient , @PathVariable int idCommande){
         this.clientService.sendRecapitulatif(idClient, idCommande);
@@ -126,7 +141,6 @@ public class ClientController {
 
 
     // Listes + postits
-
     @GetMapping("/listes")
     public List<ListeDTO> getAllListsClient() {
         Compte compte = AuthUtils.getCurrentUser();

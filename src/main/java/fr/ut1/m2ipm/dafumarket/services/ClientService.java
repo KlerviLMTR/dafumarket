@@ -581,6 +581,36 @@ public class ClientService {
     }
 
 
+    public PanierDTO convertirPanierMagasin(long idClient, int nouveauMagasin){
+        // 1. Récuperer le panier en cours
+        Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
+        if (panierDb.isPresent()) {
+
+            // Verifier les id panier + magasin.
+            Panier panier = panierDb.get();
+            // Premier cas: le panier correspond bien au magasin confirmé par le client --> Workflow normal
+            if (panier.getLignes().get(0).getProposition().getMagasin().getIdMagasin() == nouveauMagasin) {
+                // Alors ne rien faire (même magasin)
+            } else {
+
+                this.convertirPanierAvecStocksNouveauMagasin(panier, nouveauMagasin);
+
+                // Il faut récupérer le nouveau panier
+                Optional<Panier> optNouveau = this.clientDao.getActivePanierDbByIdClient(idClient);
+                if (optNouveau.isPresent()) {
+                    Panier nouveau = optNouveau.get();
+                    return panierMapper.toDto(nouveau);
+                } else {
+                    throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
+                }
+
+            }
+        }
+        throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
+
+    }
+
+
     /**
      * Confirme la commande: (étape 2/2 de la confirmation du magasin)f
      * - Mettre à jour le panier avec les stocks réellement disponibles en magasin

@@ -38,7 +38,6 @@ public class PanierMapper {
             double prixMagasin = prop.getPrix();
             double prixAvecPromo = prixMagasin * (1 - taux / 100.0);
             prixAvecPromo = Math.round(prixAvecPromo*100.0)/100.0;
-            System.out.println("stock = "+prop.getStock());
 
 
             lignesDto.add(new LignePanierDTO(
