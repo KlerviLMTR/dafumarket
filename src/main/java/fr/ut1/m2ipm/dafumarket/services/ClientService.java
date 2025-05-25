@@ -15,6 +15,7 @@ import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.activation.DataSource;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
@@ -28,6 +29,8 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -40,6 +43,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.util.UriUtils;
 
 
 @Service
@@ -147,6 +151,55 @@ public class ClientService {
             Client client = this.clientDao.getClientById(idClient);
             byte[] pdfBytes = createPdfCommande(commandeId, client);
 
+            Dotenv dotenv = Dotenv.load();
+            String apiKey = dotenv.get("GOOGLE_API_KEY");
+
+            if (apiKey != null) {
+                System.out.println("Clé API : " + apiKey);
+            } else {
+                System.out.println("Clé API non trouvée !");
+            }
+
+            Commande commande = commandeDao.getCommandeDbByID((int) commandeId);
+            Magasin magasin = commande.getPanier().getLignes().getFirst().getProposition().getMagasin();
+
+            String adresseClient = client.getAdresse()
+                    + " " + client.getCp()
+                    + " " + client.getVille();
+            String origine = URLEncoder.encode(adresseClient, StandardCharsets.UTF_8);
+
+            double lat = Double.parseDouble(magasin.getCoordonneesGps().split(",")[0]);
+            double lng = Double.parseDouble(magasin.getCoordonneesGps().split(",")[1]);
+            String destination = String.format(Locale.US, "%.6f,%.6f", lat, lng);
+
+            String rawPath = String.format(
+                    "weight:5|color:blue|%f,%f|%f,%f",
+                    lat, lng,
+                    lat, lng
+            );
+            String encodedPath = UriUtils.encode(rawPath, StandardCharsets.UTF_8);
+
+            String staticMapUrl = String.format(
+                    "https://maps.googleapis.com/maps/api/staticmap"
+                            + "?size=600x300"
+                            + "&path=%s"
+                            + "&markers=color:red|%f,%f"
+                            + "&markers=color:green|%f,%f"
+                            + "&key=%s",
+                    encodedPath,
+                    lat, lng,
+                    lat, lng,
+                    apiKey
+            );
+
+            String mapsUrl = String.format(
+                    "https://www.google.com/maps/dir/?api=1"
+                            + "&origin=%s"
+                            + "&destination=%s"
+                            + "&travelmode=driving",
+                    origine, destination
+            );
+
             if (pdfBytes == null) {
                 System.out.println("PDF non généré, email non envoyé.");
                 return;
@@ -160,15 +213,31 @@ public class ClientService {
 
             helper.setTo(client.getEmail());
             helper.setSubject("Dafu Market : facture pour la Commande #" + commandeId);
-            Commande commande = this.commandeDao.getCommandeDbByID((int) commandeId);
             CommandeDTO commandeDTO = this.commandeMapper.toDto(commande);
             String date = commandeDTO.getDateHeureRetrait().toString();
 
-            helper.setText("Bonjour " + client.getPrenom() + "\n\nVotre facture du " + date + " pour la commande #" + commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
-                    "\n\nCordialement,\nL'équipe Dafu Market");
+            String html = """
+                <p>Bonjour %s,</p>
+                <p style="color:red;">Votre facture du %s pour la commande #%d est en pièce jointe.</p>
+                <p>Pour rejoindre le magasin, cliquez sur l’image ou le lien ci-dessous :</p>
+                <p>
+                  <a href="%s" target="_blank">
+                    <img src="%s" alt="Itinéraire vers le magasin" style="border:1px solid #ccc;" />
+                  </a>
+                </p>
+                <p><a href="%s" target="_blank">Voir l’itinéraire sur Google Maps</a></p>
+                <p>Cordialement,<br>L'équipe Dafu Market</p>
+                """.formatted(
+                    client.getPrenom(),
+                    date,
+                    commandeDTO.getIdCommande(),
+                    mapsUrl,
+                    staticMapUrl,
+                    mapsUrl
+            );
 
+            helper.setText(html, true);
             helper.addAttachment("facture.pdf", dataSource);
-
             mailSender.send(message);
 
         } catch (Exception e) {

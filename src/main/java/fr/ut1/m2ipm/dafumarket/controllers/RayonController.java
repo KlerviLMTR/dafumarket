@@ -2,6 +2,7 @@ package fr.ut1.m2ipm.dafumarket.controllers;
 
 import fr.ut1.m2ipm.dafumarket.dto.RayonDTO;
 import fr.ut1.m2ipm.dafumarket.services.RayonService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
