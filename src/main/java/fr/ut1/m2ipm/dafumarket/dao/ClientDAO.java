@@ -10,6 +10,8 @@ import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PostItMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirListe;
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirListeId;
 import fr.ut1.m2ipm.dafumarket.repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,9 +38,11 @@ public class ClientDAO {
     private final CommandeMapper commandeMapper;
     private final CommandeRepository commandeRepository;
     private final ListeRepository listeRepository;
+    private final ProduitRepository produitRepository;
     private final PostItRepository postItRepository;
+    private final AppartenirListeRepository appartenirListeRepository;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em, ListeRepository listeRepository, PostItRepository postItRepository) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em, ListeRepository listeRepository, PostItRepository postItRepository, ProduitRepository produitRepository, AppartenirListeRepository appartenirListeRepository ) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
@@ -46,6 +50,8 @@ public class ClientDAO {
         this.commandeRepository = commandeRepository;
         this.listeRepository = listeRepository;
         this.postItRepository = postItRepository;
+        this.produitRepository = produitRepository;
+        this.appartenirListeRepository = appartenirListeRepository;
         //this.em = em;
 
     }
@@ -176,5 +182,42 @@ public class ClientDAO {
     public void supprimerPostIt(int idPostit) {
         this.postItRepository.deleteById(idPostit);
     }
+
+    public void ajouterOuMettreAJourElementListe(Liste liste, int idProduit, int quantite) {
+
+        // 2) Charger le produit
+        Produit produit = produitRepository.findById(idProduit)
+                .orElseThrow(() -> new EntityNotFoundException("Produit #" + idProduit + " introuvable"));
+
+        // 3) Construire la clé composite
+        AppartenirListeId pivotId = new AppartenirListeId(liste.getIdListe(), idProduit);
+
+        System.out.println("Produit "+ produit + " avec id " + pivotId + "quantite " + quantite);
+        // 4) Tester s’il existe déjà
+        if (appartenirListeRepository.existsById(pivotId)) {
+            System.out.println("MAJ quantités");
+            // Récupérer l’entité existante
+            AppartenirListe ligne = appartenirListeRepository.findById(pivotId).get();
+            // Remplacer (ou augmenter) la quantité
+            int ancienneQte = ligne.getQuantite();
+            ligne.setQuantite(ancienneQte +quantite);
+            appartenirListeRepository.save(ligne);
+        }
+        else {
+            System.out.println("ajout produit");
+
+            // Créer une nouvelle relation pivot
+            AppartenirListe ligne = new AppartenirListe();
+            ligne.setId(pivotId);
+            ligne.setListe(liste);
+            ligne.setProduit(produit);
+            ligne.setQuantite(quantite);
+            appartenirListeRepository.save(ligne);
+        }
+
+
+    }
+
+
 }
 

@@ -7,12 +7,10 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
-import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
+import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
@@ -54,10 +52,11 @@ public class ClientService {
     private final CommandeMapper commandeMapper;
     private final ProduitService produitService;
     private final LlmService llmService;
+    private final PostItDAO postItDao;
 
 
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService, PostItDAO postItDAO) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
@@ -67,6 +66,7 @@ public class ClientService {
         this.commandeMapper = commandeMapper;
         this.produitService = produitService;
         this.llmService = llmService;
+        this.postItDao = postItDAO;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -370,9 +370,21 @@ public class ClientService {
         }
     }
 
-    public Map<String, Object> traiterDemandeLLM(String message) {
+    public ListeDTO traiterDemandeLLM( int idPostit) {
         List<ProduitDTO> produits = produitService.getAllProduits();
-        return llmService.traiterRecetteAvecLLM(message, produits);
+        // Recuperer la liste du postit
+        // Recuperer le positit
+        PostIt postit = this.postItDao.getPostItById(idPostit);
+        if(postit !=null){
+            Liste listeCourses = postit.getListe();
+            String message = postit.getContenu();
+            this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses);
+
+            return ListeMapper.toDto(listeCourses);
+        }
+        throw new EntityNotFoundException("Le Postit n'existe pas");
+
+
     }
 
 
@@ -400,4 +412,6 @@ public class ClientService {
     public void supprimerPostit(int idPostit) {
         this.clientDao.supprimerPostIt(idPostit);
     }
+
+
 }

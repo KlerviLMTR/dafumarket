@@ -44,8 +44,6 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/clients/**/listes").permitAll()
 
 
-
-
 //                        .requestMatchers("/api/rayons/**").permitAll()
 //                        .requestMatchers("/api/produits/**").permitAll()
 //                        .requestMatchers("/api/magasins/**").permitAll()

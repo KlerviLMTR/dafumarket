@@ -109,9 +109,9 @@ public class ClientController {
 
 
 
-    @PostMapping("/{idClient}/postits/{idPostit}/llm")
-    public ResponseEntity<Map<String, Object>> genererListeLLM(@RequestBody String phrase) {
-        return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
+    @GetMapping("/{idClient}/postits/{idPostit}/llm")
+    public ResponseEntity<ListeDTO> genererListeLLM(@PathVariable int idPostit) {
+        return ResponseEntity.ok(clientService.traiterDemandeLLM( idPostit));
     }
 
 
@@ -143,10 +143,6 @@ public class ClientController {
     }
 
 
-    @PostMapping("/{idClient}/test-mistral")
-    public ResponseEntity<Map<String, Object>> appelLLM(@RequestBody String phrase) {
-        return ResponseEntity.ok(clientService.traiterDemandeLLM(phrase));
-    }
 
 
 
