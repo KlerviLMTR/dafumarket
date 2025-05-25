@@ -7,16 +7,12 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
-import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
-import fr.ut1.m2ipm.dafumarket.dao.PanierDAO;
+import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
 import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
-import fr.ut1.m2ipm.dafumarket.models.Client;
-import fr.ut1.m2ipm.dafumarket.models.Commande;
-import fr.ut1.m2ipm.dafumarket.models.Panier;
+import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import jakarta.activation.DataSource;
@@ -24,6 +20,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -55,10 +52,11 @@ public class ClientService {
     private final CommandeMapper commandeMapper;
     private final ProduitService produitService;
     private final LlmService llmService;
+    private final PostItDAO postItDao;
 
 
 
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService, PostItDAO postItDAO) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
@@ -68,6 +66,7 @@ public class ClientService {
         this.commandeMapper = commandeMapper;
         this.produitService = produitService;
         this.llmService = llmService;
+        this.postItDao = postItDAO;
     }
 
     public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
@@ -371,9 +370,47 @@ public class ClientService {
         }
     }
 
-    public Map<String, Object> traiterDemandeLLM(String message) {
+    public ListeDTO traiterDemandeLLM( int idPostit) {
         List<ProduitDTO> produits = produitService.getAllProduits();
-        return llmService.traiterRecetteAvecLLM(message, produits);
+        // Recuperer la liste du postit
+        // Recuperer le positit
+        PostIt postit = this.postItDao.getPostItById(idPostit);
+        if(postit !=null){
+            Liste listeCourses = postit.getListe();
+            String message = postit.getContenu();
+            this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses);
+
+            return ListeMapper.toDto(listeCourses);
+        }
+        throw new EntityNotFoundException("Le Postit n'existe pas");
+
+
+    }
+
+
+    public Liste creerListeCourses(String titreListe, int idClient)
+    {
+        return this.clientDao.creerListeCourses(titreListe,  idClient);
+    }
+
+    public List<ListeDTO> getAllListes(int idClient) {
+        return this.clientDao.getAllListes(idClient);
+    }
+
+    public ListeDTO getListeById(long idClient, long idListe) {
+        return this.clientDao.getListeById(idClient, idListe);
+    }
+
+    public PostItDTO creerPostIt(long idClient, long idListe, String saisie, String titre) {
+        return this.clientDao.creerPostIt(idClient, idListe, saisie, titre);
+    }
+
+    public PostItDTO modifierPostIt(int idPostit , String saisie) {
+        return this.clientDao.modifierPostIt(idPostit, saisie);
+    }
+
+    public void supprimerPostit(int idPostit) {
+        this.clientDao.supprimerPostIt(idPostit);
     }
 
 

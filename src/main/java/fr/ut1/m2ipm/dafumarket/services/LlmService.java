@@ -2,8 +2,10 @@ package fr.ut1.m2ipm.dafumarket.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.ProduitDAO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
+import fr.ut1.m2ipm.dafumarket.models.Liste;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,8 +21,12 @@ public class LlmService {
     private final String agentId = "ag:359ab99b:20250522:untitled-agent:0d2e13d1";
     private final String apiUrl = "https://api.mistral.ai/v1/agents/completions";
     private final String apiKey = "W4gjIutIAxTtxm3VbjMwDhuZrsgkvs9H";
+    private final  ClientDAO clientDAO;
 
-    public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits) {
+    public LlmService(ClientDAO clientDAO) {
+        this.clientDAO = clientDAO;
+    }
+    public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits, Liste listeCourses) {
         Map<String, Object> etape1 = envoyerPromptEtExtraireIngredients(phrase);
         List<String> ingredients = (List<String>) etape1.get("ingredients");
 
@@ -46,7 +52,7 @@ public class LlmService {
                 ))
                 .collect(Collectors.toList());
 
-        Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson));
+        Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson), listeCourses);
 
         return Map.of("etape1", etape1, "etape2", etape2);
     }
@@ -75,7 +81,7 @@ public class LlmService {
         }
     }
 
-    public Map<String, Object> envoyerProduitsPourValidation(Map<String, Object> jsonEnvoye) {
+    public Map<String, Object> envoyerProduitsPourValidation(Map<String, Object> jsonEnvoye, Liste listeCourses) {
         try {
             String contentJson = mapper.writeValueAsString(jsonEnvoye);
             Map<String, Object> message = Map.of("role", "user", "content", contentJson);
@@ -88,7 +94,7 @@ public class LlmService {
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(body), headers);
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 
-            return extraireProduitsSelectionnesDepuisMistral(response.getBody(), contentJson);
+            return extraireProduitsSelectionnesDepuisMistral(response.getBody(), contentJson, listeCourses );
         } catch (Exception e) {
             System.out.println("Erreur envoi validation Mistral : " + e.getMessage());
             return Map.of(
@@ -119,7 +125,7 @@ public class LlmService {
         );
     }
 
-    private Map<String, Object> extraireProduitsSelectionnesDepuisMistral(String jsonReponseMistral, String promptEnvoye) throws Exception {
+    private Map<String, Object> extraireProduitsSelectionnesDepuisMistral(String jsonReponseMistral, String promptEnvoye , Liste listeCourses) throws Exception {
         JsonNode racine = mapper.readTree(jsonReponseMistral);
         String contentJsonString = racine.path("choices").get(0).path("message").path("content").asText();
         JsonNode contentJson = mapper.readTree(contentJsonString);
@@ -127,10 +133,16 @@ public class LlmService {
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
         List<Map<String, Integer>> produits = new ArrayList<>();
         for (JsonNode p : contentJson.path("produitsSelectionnes")) {
+
+            // Ici: ajouter les produits à la liste de courses
+            this.clientDAO.ajouterOuMettreAJourElementListe(listeCourses, p.path("idProduit").asInt(), p.path("quantite").asInt());
+
             produits.add(Map.of(
                     "idProduit", p.path("idProduit").asInt(),
                     "quantite", p.path("quantite").asInt()
             ));
+
+
         }
 
         return Map.of(
@@ -139,6 +151,11 @@ public class LlmService {
                 "promptEnvoye", promptEnvoye,
                 "reponseBrute", contentJsonString
         );
+    }
+
+
+    public void ajouterProduitListe(int idProduit, int idListe){
+
     }
 
     public Map<String, List<ProduitDTO>> trouverProduitsSimilaires(List<ProduitDTO> produits, List<String> ingredients) {

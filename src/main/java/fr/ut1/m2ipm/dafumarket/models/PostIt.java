@@ -3,6 +3,8 @@ package fr.ut1.m2ipm.dafumarket.models;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "post_it")
 public class PostIt {
@@ -21,6 +23,9 @@ public class PostIt {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_liste", nullable = false)
     private Liste liste;
+
+
+
 
     public PostIt() {}
 
@@ -61,4 +66,5 @@ public class PostIt {
     public void setListe(Liste liste) {
         this.liste = liste;
     }
+
 }
