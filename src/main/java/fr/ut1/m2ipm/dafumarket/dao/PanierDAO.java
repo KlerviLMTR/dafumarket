@@ -52,7 +52,6 @@ public class PanierDAO {
         nouvelleLigne.setQuantite(quantite);
         appartenirPanierRepository.save(nouvelleLigne);
 
-        System.out.println("Ligne ajoutée !");
     }
 
     public void ajouterLigneProduitAuModele(Panier panier, Proposition proposition, int idPanier,int idProduit, int idMagasin, int quantite) {
@@ -63,7 +62,6 @@ public class PanierDAO {
         nouvelleLigne.setProposition(proposition);
         nouvelleLigne.setQuantite(quantite);
         panier.addLign(nouvelleLigne);
-        System.out.println("Ligne ajoutée au modèle !");
     }
 
     public void sauverEtatPanier(Panier p){
