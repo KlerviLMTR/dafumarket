@@ -42,7 +42,7 @@ public class ClientDAO {
     private final PostItRepository postItRepository;
     private final AppartenirListeRepository appartenirListeRepository;
 
-    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository  commandeRepository , EntityManager em, ListeRepository listeRepository, PostItRepository postItRepository, ProduitRepository produitRepository, AppartenirListeRepository appartenirListeRepository ) {
+    public ClientDAO(ClientRepository clientRepository, PanierRepository panierRepository, PanierMapper panierMapper, CommandeMapper commandeMapper, CommandeRepository commandeRepository, EntityManager em, ListeRepository listeRepository, PostItRepository postItRepository, ProduitRepository produitRepository, AppartenirListeRepository appartenirListeRepository) {
         this.clientRepository = clientRepository;
         this.panierRepository = panierRepository;
         this.panierMapper = panierMapper;
@@ -61,11 +61,11 @@ public class ClientDAO {
         return client.orElse(null);
     }
 
-    public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
+    public List<CommandeDTO> getAllCommandesByIdClient(long idClient) {
 
-        List<Commande>  commandes = this.clientRepository.findCommandesByClientId(idClient);
+        List<Commande> commandes = this.clientRepository.findCommandesByClientId(idClient);
         ArrayList<CommandeDTO> commandesDTO = new ArrayList<>();
-        for (Commande commande: commandes) {
+        for (Commande commande : commandes) {
             commandesDTO.add(this.commandeMapper.toDto(commande));
         }
         return commandesDTO;
@@ -87,7 +87,7 @@ public class ClientDAO {
     }
 
     @Transactional
-    public Panier createPanier( long idClient) {
+    public Panier createPanier(long idClient) {
         Client client = clientRepository.findById(idClient)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé"));
         Panier panier = new Panier();
@@ -112,22 +112,21 @@ public class ClientDAO {
         Optional<Client> c = this.clientRepository.findById(idClient);
         if (c.isPresent()) {
             return c.get();
-        }
-        else{
+        } else {
             return null;
         }
     }
 
-    public Liste creerListeCourses(String titreListe, int idClient) {
+    public Liste creerListeCourses(String titreListe, long idClient) {
         Liste liste = new Liste();
-        liste.setClient( getClientById(idClient) );
+        liste.setClient(getClientById(idClient));
         liste.setNom(titreListe);
         listeRepository.save(liste);
         return liste;
     }
 
-    public List<ListeDTO> getAllListes(int idClient) {
-        List<Liste> listes = listeRepository.findAllByClientIdWithItemsAndPostIts((long) idClient);
+    public List<ListeDTO> getAllListes(long idClient) {
+        List<Liste> listes = listeRepository.findAllByClientIdWithItemsAndPostIts(idClient);
         return listes.stream()
                 .map(ListeMapper::toDto)
                 .toList();
@@ -142,13 +141,8 @@ public class ClientDAO {
     }
 
     public Liste getListeDbModelById(long clientId, long listeId) {
-        Optional<Liste> optList =  this.listeRepository.findByClientIdAndIdListeWithItemsAndPostIts(clientId, (int) listeId);
-        if (!optList.isPresent()) {
-            return null;
-
-        }
-        Liste liste = optList.get();
-        return liste;
+        Optional<Liste> optList = this.listeRepository.findByClientIdAndIdListeWithItemsAndPostIts(clientId, (int) listeId);
+        return optList.orElse(null);
     }
 
 
@@ -192,7 +186,7 @@ public class ClientDAO {
         // 3) Construire la clé composite
         AppartenirListeId pivotId = new AppartenirListeId(liste.getIdListe(), idProduit);
 
-        System.out.println("Produit "+ produit + " avec id " + pivotId + "quantite " + quantite);
+        System.out.println("Produit " + produit + " avec id " + pivotId + "quantite " + quantite);
         // 4) Tester s’il existe déjà
         if (appartenirListeRepository.existsById(pivotId)) {
             System.out.println("MAJ quantités");
@@ -200,10 +194,9 @@ public class ClientDAO {
             AppartenirListe ligne = appartenirListeRepository.findById(pivotId).get();
             // Remplacer (ou augmenter) la quantité
             int ancienneQte = ligne.getQuantite();
-            ligne.setQuantite(ancienneQte +quantite);
+            ligne.setQuantite(ancienneQte + quantite);
             appartenirListeRepository.save(ligne);
-        }
-        else {
+        } else {
             System.out.println("ajout produit");
 
             // Créer une nouvelle relation pivot

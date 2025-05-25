@@ -43,10 +43,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 @Service
 public class ClientService {
 
-    private final ClientDAO clientDao ;
-    private final MagasinDAO magasinDao ;
-    private final PanierDAO panierDao ;
-    private final PanierMapper panierMapper ;
+    private final ClientDAO clientDao;
+    private final MagasinDAO magasinDao;
+    private final PanierDAO panierDao;
+    private final PanierMapper panierMapper;
     private final CommandeDAO commandeDao;
     private final JavaMailSender mailSender;
     private final CommandeMapper commandeMapper;
@@ -55,8 +55,7 @@ public class ClientService {
     private final PostItDAO postItDao;
 
 
-
-    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao , PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService, PostItDAO postItDAO) {
+    public ClientService(ClientDAO clientDao, MagasinDAO magasinDao, PanierDAO panierDao, PanierMapper panierMapper, CommandeDAO commandeDao, JavaMailSender mailSender, CommandeMapper commandeMapper, ProduitService produitService, LlmService llmService, PostItDAO postItDAO) {
         this.clientDao = clientDao;
         this.magasinDao = magasinDao;
         this.panierDao = panierDao;
@@ -69,12 +68,12 @@ public class ClientService {
         this.postItDao = postItDAO;
     }
 
-    public List<CommandeDTO> getAllCommandesByIdClient(long idClient){
+    public List<CommandeDTO> getAllCommandesByIdClient(long idClient) {
 
         return this.clientDao.getAllCommandesByIdClient(idClient);
     }
 
-    public Optional<PanierDTO> getActivePanierByIdClient(long idClient){
+    public Optional<PanierDTO> getActivePanierByIdClient(long idClient) {
         return this.clientDao.getActivePanierByIdClient(idClient);
     }
 
@@ -85,21 +84,20 @@ public class ClientService {
 
         if (!optPanier.isPresent()) {
             // 1.bis Alors il faut creer le panier
-            panierEntity =this.clientDao.createPanier(idClient);
-           // System.out.println("PANIER CREE : "+ panierEntity);
-        }
-        else {
+            panierEntity = this.clientDao.createPanier(idClient);
+            // System.out.println("PANIER CREE : "+ panierEntity);
+        } else {
             panierEntity = optPanier.get();
         }
         // 2. Verifier que le produit est bien propose par le magasin
         Proposition proposition = this.magasinDao.getProduitProposeDbMagasinById(idMagasin, idProduit);
         if (proposition != null) {
-          //  System.out.println("La proposition existe bien :"+ proposition);
+            //  System.out.println("La proposition existe bien :"+ proposition);
             //3. L'ajouter
-        }else{
+        } else {
             throw new EntityNotFoundException("La proposition de produit n'a pas été trouvée pour ce magasin et ce produit");
         }
-        this.ajouterLigneProduitPanier(proposition,  quantite,  panierEntity);
+        this.ajouterLigneProduitPanier(proposition, quantite, panierEntity);
 
 
         //4. a la fin de la logique d'ajout,verifier si le panier existe encore. Si oui, renvoyer le panier dto
@@ -126,12 +124,11 @@ public class ClientService {
             if (quantite <= 0) {
                 panier.getLignes().remove(lignePanier);
 
-                this.panierDao.supprimerLigneDuPanier(lignePanier, panier );
+                this.panierDao.supprimerLigneDuPanier(lignePanier, panier);
             } else {
-               this.panierDao.miseAJourQuantiteLignePanier(lignePanier, quantite);
+                this.panierDao.miseAJourQuantiteLignePanier(lignePanier, quantite);
             }
-        }
-        else{
+        } else {
             System.out.println("Pas de ligne panier trouvée, il faut ajouter la ligne ");
             if (quantite > 0) {
                 this.panierDao.ajouterLigneProduitAuPanier(panier, proposition, quantite);
@@ -163,7 +160,7 @@ public class ClientService {
             CommandeDTO commandeDTO = this.commandeMapper.toDto(commande);
             String date = commandeDTO.getDateHeureRetrait().toString();
 
-            helper.setText("Bonjour " + client.getPrenom() + "\n\nVotre facture du "+ date + " pour la commande #"+ commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
+            helper.setText("Bonjour " + client.getPrenom() + "\n\nVotre facture du " + date + " pour la commande #" + commandeDTO.getIdCommande() + " est arrivée, veuillez la retrouver en pièce jointe." +
                     "\n\nCordialement,\nL'équipe Dafu Market");
 
             helper.addAttachment("facture.pdf", dataSource);
@@ -191,11 +188,11 @@ public class ClientService {
             String nomMagasin = magasinDto.getNom();
             String numero = magasinDto.getNumero();
 
-            String societeInfo = "\n"+
+            String societeInfo = "\n" +
                     nomMagasin + "\n" +
                     adresseMagasin + "\n" +
                     codePostalMagasin + " " + villeMagasin +
-                    "\n"+numero + "\n" ;
+                    "\n" + numero + "\n";
 
             // Création du PDF
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -335,7 +332,6 @@ public class ClientService {
             table.addCell(economieMontantCell);
 
 
-
             document.add(table);
 
             document.add(new Paragraph("\nMerci pour votre commande et à bientôt dans nos magasins Dafu Market !",
@@ -362,6 +358,7 @@ public class ClientService {
     public Client getClient(long idClient) {
         return this.clientDao.getClient(idClient);
     }
+
     public void supprimerPanier(long idClient) {
         Optional<Panier> optPanier = clientDao.getActivePanierDbByIdClient(idClient);
         if (optPanier.isPresent()) {
@@ -370,12 +367,12 @@ public class ClientService {
         }
     }
 
-    public ListeDTO traiterDemandeLLM( int idPostit) {
+    public ListeDTO traiterDemandeLLM(int idPostit) {
         List<ProduitDTO> produits = produitService.getAllProduits();
         // Recuperer la liste du postit
         // Recuperer le positit
         PostIt postit = this.postItDao.getPostItById(idPostit);
-        if(postit !=null){
+        if (postit != null) {
             Liste listeCourses = postit.getListe();
             String message = postit.getContenu();
             this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses);
@@ -388,12 +385,11 @@ public class ClientService {
     }
 
 
-    public Liste creerListeCourses(String titreListe, int idClient)
-    {
-        return this.clientDao.creerListeCourses(titreListe,  idClient);
+    public Liste creerListeCourses(String titreListe, long idClient) {
+        return this.clientDao.creerListeCourses(titreListe, idClient);
     }
 
-    public List<ListeDTO> getAllListes(int idClient) {
+    public List<ListeDTO> getAllListes(long idClient) {
         return this.clientDao.getAllListes(idClient);
     }
 
@@ -405,7 +401,7 @@ public class ClientService {
         return this.clientDao.creerPostIt(idClient, idListe, saisie, titre);
     }
 
-    public PostItDTO modifierPostIt(int idPostit , String saisie) {
+    public PostItDTO modifierPostIt(int idPostit, String saisie) {
         return this.clientDao.modifierPostIt(idPostit, saisie);
     }
 
