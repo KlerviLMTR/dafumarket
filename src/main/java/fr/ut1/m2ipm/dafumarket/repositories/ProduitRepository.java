@@ -1,5 +1,7 @@
 package fr.ut1.m2ipm.dafumarket.repositories;
 
+import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
+import fr.ut1.m2ipm.dafumarket.models.Marque;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
-import java.util.List;
+
 import java.util.Optional;
 
 @Repository
@@ -33,4 +35,5 @@ public interface ProduitRepository extends JpaRepository<Produit, Integer> {
 
     List<Produit> findByNomContainingIgnoreCase(String nom, Pageable pageable);
 
+    List<Produit> findByMarqueNom(String nomMarque);
 }
