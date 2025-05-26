@@ -36,4 +36,6 @@ public interface ProduitRepository extends JpaRepository<Produit, Integer> {
     List<Produit> findByNomContainingIgnoreCase(String nom, Pageable pageable);
 
     List<Produit> findByMarqueNom(String nomMarque);
+
+    List<Produit> findDistinctByCategories_Categorie_EstEnPreviewTrue();
 }
