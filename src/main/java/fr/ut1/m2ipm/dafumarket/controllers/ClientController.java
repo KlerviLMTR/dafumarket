@@ -182,8 +182,12 @@ public class ClientController {
     }
 
     @PatchMapping("/postits/{idPostit}")
-    public PostItDTO modifierPostIt(@PathVariable int idPostit, @RequestBody String saisie) {
-        return this.clientService.modifierPostIt(idPostit, saisie);
+    public PostItDTO modifierPostIt(
+            @PathVariable int idPostit,
+            @RequestBody PostitUpdateRequestDTO body
+    ) {
+        return this.clientService
+                .modifierPostIt(idPostit, body.getSaisie());
     }
 
     @DeleteMapping("/postits/{idPostit}")
