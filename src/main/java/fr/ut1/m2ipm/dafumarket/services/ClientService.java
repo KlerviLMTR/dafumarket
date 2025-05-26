@@ -9,9 +9,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
-import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
-import fr.ut1.m2ipm.dafumarket.mappers.ListeMapper;
-import fr.ut1.m2ipm.dafumarket.mappers.PanierMapper;
+import fr.ut1.m2ipm.dafumarket.mappers.*;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
@@ -776,7 +774,7 @@ public class ClientService {
 
     }
 
-    public ListeDTO traiterDemandeLLM(int idPostit) {
+    public ReponseLLMDTO traiterDemandeLLM(int idPostit) {
         List<ProduitDTO> produits = produitService.getAllProduits();
         // Recuperer la liste du postit
         // Recuperer le positit
@@ -785,8 +783,10 @@ public class ClientService {
             Liste listeCourses = postit.getListe();
             String message = postit.getContenu();
             this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses, postit);
-
-            return ListeMapper.toDto(listeCourses);
+            // Mettre à jour le postit avec la liste de courses
+            ListeReponseLLMDTO listeRep = ListeReponseLLMMapper.toDto(listeCourses);
+            PostItDTO postitRep = PostItMapper.toDto(postit);
+            return new ReponseLLMDTO(postitRep, listeRep);
         }
         throw new EntityNotFoundException("Le Postit n'existe pas");
 
