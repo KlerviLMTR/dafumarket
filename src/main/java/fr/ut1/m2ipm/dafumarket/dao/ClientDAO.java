@@ -159,8 +159,6 @@ public class ClientDAO {
         liste.getPostIts().add(postIt);
 
         postItRepository.save(postIt);
-
-
         return PostItMapper.toDto(postIt);
     }
 
@@ -177,38 +175,38 @@ public class ClientDAO {
         this.postItRepository.deleteById(idPostit);
     }
 
-    public void ajouterOuMettreAJourElementListe(Liste liste, int idProduit, int quantite) {
-
-        // 2) Charger le produit
+    @Transactional
+    public void ajouterOuMettreAJourElementListe(Liste liste,
+                                                 int idProduit,
+                                                 int quantite) {
         Produit produit = produitRepository.findById(idProduit)
                 .orElseThrow(() -> new EntityNotFoundException("Produit #" + idProduit + " introuvable"));
 
-        // 3) Construire la clé composite
-        AppartenirListeId pivotId = new AppartenirListeId(liste.getIdListe(), idProduit);
+        // Au lieu de findById(pivotId) :
+        Optional<AppartenirListe> optLigne =
+                appartenirListeRepository.findByListe_IdListeAndProduit_IdProduit(
+                        liste.getIdListe(),
+                        idProduit
+                );
 
-        System.out.println("Produit " + produit + " avec id " + pivotId + "quantite " + quantite);
-        // 4) Tester s’il existe déjà
-        if (appartenirListeRepository.existsById(pivotId)) {
-            System.out.println("MAJ quantités");
-            // Récupérer l’entité existante
-            AppartenirListe ligne = appartenirListeRepository.findById(pivotId).get();
-            // Remplacer (ou augmenter) la quantité
-            int ancienneQte = ligne.getQuantite();
-            ligne.setQuantite(ancienneQte + quantite);
-            appartenirListeRepository.save(ligne);
+        if (optLigne.isPresent()) {
+            AppartenirListe ligne = optLigne.get();
+            ligne.setQuantite(ligne.getQuantite() + quantite);
+            // pas besoin de save explicite, l'entité est gérée
         } else {
-            System.out.println("ajout produit");
-
-            // Créer une nouvelle relation pivot
-            AppartenirListe ligne = new AppartenirListe();
-            ligne.setId(pivotId);
-            ligne.setListe(liste);
-            ligne.setProduit(produit);
-            ligne.setQuantite(quantite);
-            appartenirListeRepository.save(ligne);
+            AppartenirListe nouvelle = new AppartenirListe();
+            nouvelle.setId(new AppartenirListeId(liste.getIdListe(), idProduit));
+            nouvelle.setListe(liste);
+            nouvelle.setProduit(produit);
+            nouvelle.setQuantite(quantite);
+            appartenirListeRepository.save(nouvelle);
         }
+    }
 
 
+    public PostIt updatePostItLLM(PostIt postIt, String reponseLLM) {
+        postIt.setReponseLLM(reponseLLM);
+        return postItRepository.save(postIt);
     }
 
 

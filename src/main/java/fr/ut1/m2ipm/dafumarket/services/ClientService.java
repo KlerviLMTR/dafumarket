@@ -782,7 +782,7 @@ public class ClientService {
         if (postit != null) {
             Liste listeCourses = postit.getListe();
             String message = postit.getContenu();
-            this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses);
+            this.llmService.traiterRecetteAvecLLM(message, produits, listeCourses, postit);
 
             return ListeMapper.toDto(listeCourses);
         }

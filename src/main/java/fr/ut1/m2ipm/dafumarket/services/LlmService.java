@@ -6,6 +6,7 @@ import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
 import fr.ut1.m2ipm.dafumarket.dao.ProduitDAO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.models.Liste;
+import fr.ut1.m2ipm.dafumarket.models.PostIt;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,15 +22,17 @@ public class LlmService {
     private final String agentId = "ag:359ab99b:20250522:untitled-agent:0d2e13d1";
     private final String apiUrl = "https://api.mistral.ai/v1/agents/completions";
     private final String apiKey = "W4gjIutIAxTtxm3VbjMwDhuZrsgkvs9H";
-    private final  ClientDAO clientDAO;
+    private final ClientDAO clientDAO;
 
     public LlmService(ClientDAO clientDAO) {
         this.clientDAO = clientDAO;
     }
-    public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits, Liste listeCourses) {
-        Map<String, Object> etape1 = envoyerPromptEtExtraireIngredients(phrase);
-        List<String> ingredients = (List<String>) etape1.get("ingredients");
 
+    public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits, Liste listeCourses, PostIt postIt) {
+        Map<String, Object> etape1 = envoyerPromptEtExtraireIngredients(phrase);
+        System.out.println("Etape 1 : " + etape1.get("reponseUtilisateur"));
+        List<String> ingredients = (List<String>) etape1.get("ingredients");
+        System.out.println("Traiter avec LLM");
         if (ingredients == null || ingredients.isEmpty()) {
             Map<String, Object> etape2 = Map.of(
                     "reponseUtilisateur", "Aucun ingrédient détecté dans la demande.",
@@ -52,7 +55,7 @@ public class LlmService {
                 ))
                 .collect(Collectors.toList());
 
-        Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson), listeCourses);
+        Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson), listeCourses, postIt);
 
         return Map.of("etape1", etape1, "etape2", etape2);
     }
@@ -81,7 +84,7 @@ public class LlmService {
         }
     }
 
-    public Map<String, Object> envoyerProduitsPourValidation(Map<String, Object> jsonEnvoye, Liste listeCourses) {
+    public Map<String, Object> envoyerProduitsPourValidation(Map<String, Object> jsonEnvoye, Liste listeCourses, PostIt postIt) {
         try {
             String contentJson = mapper.writeValueAsString(jsonEnvoye);
             Map<String, Object> message = Map.of("role", "user", "content", contentJson);
@@ -94,7 +97,7 @@ public class LlmService {
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(body), headers);
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 
-            return extraireProduitsSelectionnesDepuisMistral(response.getBody(), contentJson, listeCourses );
+            return extraireProduitsSelectionnesDepuisMistral(response.getBody(), contentJson, listeCourses, postIt);
         } catch (Exception e) {
             System.out.println("Erreur envoi validation Mistral : " + e.getMessage());
             return Map.of(
@@ -112,9 +115,11 @@ public class LlmService {
         JsonNode contentJson = mapper.readTree(contentJsonString);
 
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
+        System.out.println("Réponse utilisateur : " + reponseUtilisateur);
         List<String> ingredients = new ArrayList<>();
         for (JsonNode node : contentJson.path("ingredients")) {
             ingredients.add(node.asText());
+
         }
 
         return Map.of(
@@ -125,7 +130,8 @@ public class LlmService {
         );
     }
 
-    private Map<String, Object> extraireProduitsSelectionnesDepuisMistral(String jsonReponseMistral, String promptEnvoye , Liste listeCourses) throws Exception {
+    private Map<String, Object> extraireProduitsSelectionnesDepuisMistral(String jsonReponseMistral, String promptEnvoye, Liste listeCourses, PostIt postit) throws Exception {
+
         JsonNode racine = mapper.readTree(jsonReponseMistral);
         String contentJsonString = racine.path("choices").get(0).path("message").path("content").asText();
         JsonNode contentJson = mapper.readTree(contentJsonString);
@@ -133,9 +139,13 @@ public class LlmService {
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
         List<Map<String, Integer>> produits = new ArrayList<>();
         for (JsonNode p : contentJson.path("produitsSelectionnes")) {
-
+            System.out.println("Produit sélectionné : " + p.path("idProduit").asInt() + " - Quantité : " + p.path("quantite").asInt());
+            System.out.println("Texte llm :" + reponseUtilisateur);
             // Ici: ajouter les produits à la liste de courses
             this.clientDAO.ajouterOuMettreAJourElementListe(listeCourses, p.path("idProduit").asInt(), p.path("quantite").asInt());
+            // Mettre à jour le postit
+            this.clientDAO.updatePostItLLM(postit, reponseUtilisateur);
+
 
             produits.add(Map.of(
                     "idProduit", p.path("idProduit").asInt(),
@@ -154,7 +164,7 @@ public class LlmService {
     }
 
 
-    public void ajouterProduitListe(int idProduit, int idListe){
+    public void ajouterProduitListe(int idProduit, int idListe) {
 
     }
 

@@ -6,6 +6,7 @@ import fr.ut1.m2ipm.dafumarket.models.PostIt;
 public class PostItMapper {
     /**
      * Convertit une entité PostIt en DTO PostItDTO
+     *
      * @param postIt l'entité à mapper
      * @return le DTO correspondant
      */
@@ -16,7 +17,8 @@ public class PostItMapper {
         return new PostItDTO(
                 postIt.getIdPost(),
                 postIt.getTitre(),
-                postIt.getContenu()
+                postIt.getContenu(),
+                postIt.getReponseLLM()
         );
     }
 }
