@@ -9,6 +9,7 @@ import fr.ut1.m2ipm.dafumarket.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.data.domain.Pageable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +60,9 @@ public class ProduitDAO {
         return produitRepository.produitsByCategorie(id).stream().map(ProduitMapper::toDto).toList();
     }
 
-    public Produit creerProduit( String nom, double poids, String description, String nutriscore, String origine,
-                              double prixRecommande, String imageUrl,
-                              String nomMarque, String libelleUnite, String[] designationsLabel, String[] nomsCategories){
+    public Produit creerProduit(String nom, double poids, String description, String nutriscore, String origine,
+                                double prixRecommande, String imageUrl,
+                                String nomMarque, String libelleUnite, String[] designationsLabel, String[] nomsCategories) {
 
         Marque marque = this.marqueRepository.findByNom(nomMarque)
                 .orElseGet(() -> {
@@ -80,8 +81,7 @@ public class ProduitDAO {
         // Ajout des labels (relation pivot)
         if (designationsLabel.length == 0) {
             System.out.println("Pas de labels");
-        }
-        else {
+        } else {
             for (String designation : designationsLabel) {
                 System.out.println("Label : " + designation);
                 Label label = this.labelRepository.findByDesignation(designation).orElseThrow();
@@ -90,7 +90,7 @@ public class ProduitDAO {
         }
 
         // Ajout des catégories (relation pivot)
-        for (String  designation : nomsCategories) {
+        for (String designation : nomsCategories) {
             System.out.println("Categorie : " + designation);
             Categorie categorie = this.categorieRepository.findByIntitule(designation).orElseThrow();
             this.appartenirCategorieRepository.save(new AppartenirCategorie(produit, categorie));
@@ -116,7 +116,7 @@ public class ProduitDAO {
     }
 
 
-    public  List<ProduitDTO> getProduitByMarque(String marque) {
+    public List<ProduitDTO> getProduitByMarque(String marque) {
         // Chercher la marque
         List<Produit> produits = this.produitRepository.findByMarqueNom(marque);
         List<ProduitDTO> produitDTOs = new ArrayList<>();
@@ -126,5 +126,16 @@ public class ProduitDAO {
 
         return produitDTOs;
 
+    }
+
+    public List<ProduitDTO> getAllProduitsEnPreview() {
+        List<Produit> produits = produitRepository.findDistinctByCategories_Categorie_EstEnPreviewTrue();
+        List<ProduitDTO> produitDTOs = new ArrayList<>();
+        System.out.println("ici");
+        for (Produit produit : produits) {
+            System.out.println("produit" + produit.getNom());
+            produitDTOs.add(ProduitMapper.toDto(produit));
+        }
+        return produitDTOs;
     }
 }

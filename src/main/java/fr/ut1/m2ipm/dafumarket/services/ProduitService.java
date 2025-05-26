@@ -31,7 +31,8 @@ public class ProduitService {
         return produitDAO.getProduitsByCategorieId(idRayon);
     }
 
-    public List<ProduitDTO> getProduitBySearch(String search, int limit){return this.produitDAO.getProduitBySearch(search, limit);
+    public List<ProduitDTO> getProduitBySearch(String search, int limit) {
+        return this.produitDAO.getProduitBySearch(search, limit);
     }
 
     public List<ProduitDTO> getProduitsByMarque(String marque) {
@@ -39,4 +40,7 @@ public class ProduitService {
     }
 
 
+    public List<ProduitDTO> getProduitsEnPreview() {
+        return this.produitDAO.getAllProduitsEnPreview();
+    }
 }

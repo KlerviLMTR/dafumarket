@@ -3,6 +3,7 @@ package fr.ut1.m2ipm.dafumarket.services;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dao.ProduitDAO;
 import fr.ut1.m2ipm.dafumarket.dao.PropositionProduitDAO;
+import fr.ut1.m2ipm.dafumarket.dto.CategorieDTO;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
@@ -119,4 +120,5 @@ public class PropositionService {
         return null;
     }
 
+   
 }

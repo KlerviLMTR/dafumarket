@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.controllers;
 
+import fr.ut1.m2ipm.dafumarket.dto.CategorieDTO;
 import fr.ut1.m2ipm.dafumarket.dto.RayonDTO;
 import fr.ut1.m2ipm.dafumarket.services.RayonService;
 import org.springframework.http.ResponseEntity;
@@ -45,4 +46,9 @@ public class RayonController {
         return this.rayonService.getRayonById(idRayon);
     }
 
+
+    @GetMapping("/categories/preview")
+    public List<CategorieDTO> getAllCategoriesPreview() {
+        return this.rayonService.getAllCategoriesPreview();
+    }
 }

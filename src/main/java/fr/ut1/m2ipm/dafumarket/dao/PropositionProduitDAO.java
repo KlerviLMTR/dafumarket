@@ -1,5 +1,6 @@
 package fr.ut1.m2ipm.dafumarket.dao;
 
+import fr.ut1.m2ipm.dafumarket.dto.CategorieDTO;
 import fr.ut1.m2ipm.dafumarket.models.Magasin;
 import fr.ut1.m2ipm.dafumarket.models.Produit;
 import fr.ut1.m2ipm.dafumarket.models.Promotion;
@@ -29,6 +30,7 @@ public class PropositionProduitDAO {
 
     /**
      * Insere une nouvelle proposition de produit (prix et stock) pour un magasin et un produit donné
+     *
      * @param magasin
      * @param produit
      * @param stock
@@ -42,6 +44,7 @@ public class PropositionProduitDAO {
 
     /**
      * Enregistre une proposition dans la base de données
+     *
      * @param proposition
      * @return
      */
@@ -57,8 +60,6 @@ public class PropositionProduitDAO {
         proposition.setStock(stock);
         this.propositionRepository.save(proposition);
     }
-
-
 
 
 }

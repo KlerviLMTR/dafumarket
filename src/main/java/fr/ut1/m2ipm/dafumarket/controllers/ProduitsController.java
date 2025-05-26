@@ -56,11 +56,6 @@ public class ProduitsController {
     }
 
 
-
-
-
-
-
     @GetMapping(value = {"/rayon/{idRayon}"})
     public List<ProduitDTO> getProduitsByRayon(@PathVariable Integer idRayon) {
         return this.produitService.getProduitsByRayon(idRayon);
@@ -69,6 +64,12 @@ public class ProduitsController {
     @GetMapping(value = {"/categorie/{idCategorie}"})
     public List<ProduitDTO> getProduitsByCategorie(@PathVariable Integer idCategorie) {
         return this.produitService.getProduitsByCategorie(idCategorie);
+    }
+
+
+    @GetMapping(value = {"/preview"})
+    public List<ProduitDTO> getProduitsEnPreview() {
+        return this.produitService.getProduitsEnPreview();
     }
 
 
