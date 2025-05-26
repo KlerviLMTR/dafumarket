@@ -145,11 +145,21 @@ public class ClientController {
     }
 
     @PostMapping("/listes")
-    public Liste creerListeCourses(@RequestBody String titreListe) {
+    public Liste creerListeCourses(
+            @RequestBody CreateListeRequestDTO requestDTO
+    ) {
+        // Récupération du client authentifié
         Compte compte = AuthUtils.getCurrentUser();
-        Client client = clientDAO.getClientByCompte(compte);
-        return this.clientService.creerListeCourses(titreListe, client.getIdClient());
+        Client client  = clientDAO.getClientByCompte(compte);
+
+        // On récupère le titre depuis le DTO
+        String titreListe = requestDTO.getTitre();
+
+        // On délègue au service, et on renvoie un DTO de réponse
+        return clientService.creerListeCourses(titreListe, client.getIdClient());
     }
+
+
 
     @PatchMapping("/listes/{idListe}")
     public ListeDTO ajouterElementListe(@PathVariable int idListe , @RequestParam int idProduit, @RequestParam int quantite) {
