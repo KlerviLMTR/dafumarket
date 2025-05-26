@@ -5,18 +5,12 @@ import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.ClientMapper;
 import fr.ut1.m2ipm.dafumarket.models.*;
 import fr.ut1.m2ipm.dafumarket.models.Client;
-
 import fr.ut1.m2ipm.dafumarket.services.ClientService;
 import fr.ut1.m2ipm.dafumarket.utils.AuthUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 
@@ -164,6 +158,13 @@ public class ClientController {
         return this.clientService.ajouterProduitListe(client, idListe, idProduit, quantite);
     }
 
+    @DeleteMapping("/listes/{idListe}")
+    public ResponseEntity deleteListe(@PathVariable int idListe) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        this.clientService.supprimerListe(idListe ,client);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/postits/{idPostit}/llm")
     public ResponseEntity<ReponseLLMDTO> genererListeLLM(@PathVariable int idPostit) {
