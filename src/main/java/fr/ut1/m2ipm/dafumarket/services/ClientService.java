@@ -151,9 +151,10 @@ public class ClientService {
             Client client = this.clientDao.getClientById(idClient);
             byte[] pdfBytes = createPdfCommande(commandeId, client);
 
-            Dotenv dotenv = Dotenv.load();
+            Dotenv dotenv = Dotenv.configure()
+                    .directory("./")
+                    .load();
             String apiKey = dotenv.get("GOOGLE_API_KEY");
-
 
 
             Commande commande = commandeDao.getCommandeDbByID((int) commandeId);
@@ -212,89 +213,89 @@ public class ClientService {
             CommandeDTO commandeDTO = this.commandeMapper.toDto(commande);
             String date = commandeDTO.getDateHeureRetrait().toString();
 
-           // ClassPathResource logo = new ClassPathResource("static/logo_dafu.png");
+            // ClassPathResource logo = new ClassPathResource("static/logo_dafu.png");
             //helper.addInline("logoCid", logo, "image/png");
 
             String html = """
-                <html>
-                  <body style="font-family: Arial, sans-serif; background-color: #F8F5F5; margin:0; padding:0;">
-                    <!-- header -->
-                       <div style="text-align:center; background-color:white; margin-bottom:30px;">
-                                          <h1 style="
-                                               margin:0;
-                                               font-size:28px;
-                                               color:#0a3175;
-                                               line-height:1.2;
-                                               ">
-                                            Merci pour votre commande<br/>chez DafuMarket !
-                                          </h1>
-                                          <div style="
-                                               width:80px;
-                                               height:4px;
-                                               background:#b41967;
-                                               margin:8px auto 0;
-                                               border-radius:2px;
-                                               ">
-                                          </div>
-                       </div>
-                        
-            
-                    <!-- corps du mail -->
-                    <div style="max-width:600px; margin:30px auto; background-color:#ffffff; 
-                                border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px;">
-                      
-                      <h1 style="font-size:24px; color:#333333; margin-bottom:10px;">
-                        Bonjour %s,
-                      </h1>
-            
-                      <p style="font-size:16px; color:#555555; line-height:1.5;">
-                        Votre facture du <strong>%s</strong> pour la commande 
-                        <strong>#%d</strong> est disponible en pièce jointe.
-                      </p>
-            
-                      <hr style="border:none; border-top:1px solid #eeeeee; margin:20px 0;" />
-            
-                      <p style="font-size:16px; color:#555555;">
-                        Pour rejoindre notre magasin, cliquez sur l’image ou le lien ci-dessous :
-                      </p>
-            
-                      <div style="text-align:center; margin:20px 0;">
-                        <a href="%s" target="_blank" style="text-decoration:none;">
-                          <img src="%s" 
-                               alt="Itinéraire vers le magasin" 
-                               style="width:100%%; max-width:500px; border-radius:4px;"/>
-                        </a>
-                      </div>
-            
-                      <p style="text-align:center; margin-bottom:20px;">
-                        <a href="%s" target="_blank" 
-                           style="display:inline-block; padding:10px 20px; background-color:#004aad; 
-                                  color:#ffffff; border-radius:4px; text-decoration:none; font-weight:bold;">
-                          Voir l’itinéraire sur Google Maps
-                        </a>
-                      </p>
-            
-                      <p style="font-size:14px; color:#777777; line-height:1.5;">
-                        Merci de faire confiance à Dafu Market pour vos courses en drive.<br/>
-                        À très bientôt !<br/><br/>
-                        <em>L’équipe Dafu Market</em>
-                      </p>
-                    </div>
-            
-                    <!-- footer -->
-                    <div style="text-align:center; font-size:12px; color:#aaaaaa; padding:10px;">
-                      © 2025 Dafu Market – Tous droits réservés
-                    </div>
-                  </body>
-                </html>
-                """.formatted(
-                                client.getPrenom(),
-                                date,
-                                commandeDTO.getIdCommande(),
-                                mapsUrl,
-                                staticMapUrl,
-                                mapsUrl
-                        );
+                    <html>
+                      <body style="font-family: Arial, sans-serif; background-color: #F8F5F5; margin:0; padding:0;">
+                        <!-- header -->
+                           <div style="text-align:center; background-color:white; margin-bottom:30px;">
+                                              <h1 style="
+                                                   margin:0;
+                                                   font-size:28px;
+                                                   color:#0a3175;
+                                                   line-height:1.2;
+                                                   ">
+                                                Merci pour votre commande<br/>chez DafuMarket !
+                                              </h1>
+                                              <div style="
+                                                   width:80px;
+                                                   height:4px;
+                                                   background:#b41967;
+                                                   margin:8px auto 0;
+                                                   border-radius:2px;
+                                                   ">
+                                              </div>
+                           </div>
+                    
+                    
+                        <!-- corps du mail -->
+                        <div style="max-width:600px; margin:30px auto; background-color:#ffffff; 
+                                    border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:20px;">
+                    
+                          <h1 style="font-size:24px; color:#333333; margin-bottom:10px;">
+                            Bonjour %s,
+                          </h1>
+                    
+                          <p style="font-size:16px; color:#555555; line-height:1.5;">
+                            Votre facture du <strong>%s</strong> pour la commande 
+                            <strong>#%d</strong> est disponible en pièce jointe.
+                          </p>
+                    
+                          <hr style="border:none; border-top:1px solid #eeeeee; margin:20px 0;" />
+                    
+                          <p style="font-size:16px; color:#555555;">
+                            Pour rejoindre notre magasin, cliquez sur l’image ou le lien ci-dessous :
+                          </p>
+                    
+                          <div style="text-align:center; margin:20px 0;">
+                            <a href="%s" target="_blank" style="text-decoration:none;">
+                              <img src="%s" 
+                                   alt="Itinéraire vers le magasin" 
+                                   style="width:100%%; max-width:500px; border-radius:4px;"/>
+                            </a>
+                          </div>
+                    
+                          <p style="text-align:center; margin-bottom:20px;">
+                            <a href="%s" target="_blank" 
+                               style="display:inline-block; padding:10px 20px; background-color:#004aad; 
+                                      color:#ffffff; border-radius:4px; text-decoration:none; font-weight:bold;">
+                              Voir l’itinéraire sur Google Maps
+                            </a>
+                          </p>
+                    
+                          <p style="font-size:14px; color:#777777; line-height:1.5;">
+                            Merci de faire confiance à Dafu Market pour vos courses en drive.<br/>
+                            À très bientôt !<br/><br/>
+                            <em>L’équipe Dafu Market</em>
+                          </p>
+                        </div>
+                    
+                        <!-- footer -->
+                        <div style="text-align:center; font-size:12px; color:#aaaaaa; padding:10px;">
+                          © 2025 Dafu Market – Tous droits réservés
+                        </div>
+                      </body>
+                    </html>
+                    """.formatted(
+                    client.getPrenom(),
+                    date,
+                    commandeDTO.getIdCommande(),
+                    mapsUrl,
+                    staticMapUrl,
+                    mapsUrl
+            );
 
             helper.setText(html, true);
             helper.addAttachment("facture.pdf", dataSource);
@@ -581,7 +582,7 @@ public class ClientService {
     }
 
 
-    public PanierDTO convertirPanierMagasin(long idClient, int nouveauMagasin){
+    public PanierDTO convertirPanierMagasin(long idClient, int nouveauMagasin) {
         // 1. Récuperer le panier en cours
         Optional<Panier> panierDb = this.clientDao.getActivePanierDbByIdClient(idClient);
         if (panierDb.isPresent()) {
@@ -596,7 +597,6 @@ public class ClientService {
             } else {
 
                 this.convertirPanierAvecStocksNouveauMagasin(panier, nouveauMagasin);
-
 
 
             }
