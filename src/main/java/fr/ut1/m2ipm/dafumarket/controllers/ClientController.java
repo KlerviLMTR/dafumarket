@@ -161,7 +161,7 @@ public class ClientController {
 
 
     @GetMapping("/postits/{idPostit}/llm")
-    public ResponseEntity<ListeDTO> genererListeLLM(@PathVariable int idPostit) {
+    public ResponseEntity<ReponseLLMDTO> genererListeLLM(@PathVariable int idPostit) {
         return ResponseEntity.ok(clientService.traiterDemandeLLM(idPostit));
     }
 
