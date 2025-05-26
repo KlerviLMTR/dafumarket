@@ -66,7 +66,6 @@ public class ClientController {
 
     @PostMapping("/panier")
     public ResponseEntity<Optional<PanierDTO>> ajouterProduitAuPanier(@RequestParam(value = "idProduit") int idProduit, @RequestParam(value = "quantite") int quantite, @RequestParam(value = "idMagasin") int idMagasin) {
-        System.out.println("PANIER");
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         Optional<PanierDTO> panierDTO = clientService.ajouterProduitAuPanier(client.getIdClient(), idProduit, quantite, idMagasin);
@@ -108,7 +107,6 @@ public class ClientController {
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         PanierDTO p = this.clientService.convertirPanierMagasin(client.getIdClient(), idMagasin);
-        System.out.println();
         return ResponseEntity.ok(p);
     }
 
@@ -164,7 +162,6 @@ public class ClientController {
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
         return this.clientService.ajouterProduitListe(client, idListe, idProduit, quantite);
-
     }
 
 

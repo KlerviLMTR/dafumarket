@@ -812,15 +812,17 @@ public class ClientService {
     }
 
 
+
     public ListeDTO ajouterProduitListe(Client c, int idListe, int idProduit, int quantite) {
-        System.out.println("id liste:"+idListe);
-        System.out.println("id Client :"+ c.getIdClient());
         ;
         Liste liste = this.clientDao.getListeDbModelById(c.getIdClient(), idListe);
         if (liste != null) {
-            this.clientDao.ajouterOuMettreAJourElementListe(liste, idProduit, quantite);
+            this.clientDao.ajouterOuMettreAJourElementListeUser(liste, idProduit, quantite);
             System.out.println("liste ok !");
         }
+
         return ListeMapper.toDto(liste);
     }
+
+
 }

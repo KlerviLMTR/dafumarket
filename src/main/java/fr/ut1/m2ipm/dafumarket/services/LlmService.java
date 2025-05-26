@@ -3,7 +3,6 @@ package fr.ut1.m2ipm.dafumarket.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ut1.m2ipm.dafumarket.dao.ClientDAO;
-import fr.ut1.m2ipm.dafumarket.dao.ProduitDAO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitDTO;
 import fr.ut1.m2ipm.dafumarket.models.Liste;
 import fr.ut1.m2ipm.dafumarket.models.PostIt;
@@ -145,7 +144,7 @@ public class LlmService {
         List<Map<String, Integer>> produits = new ArrayList<>();
         for (JsonNode p : contentJson.path("produitsSelectionnes")) {
             // Ici: ajouter les produits à la liste de courses
-            this.clientDAO.ajouterOuMettreAJourElementListe(listeCourses, p.path("idProduit").asInt(), p.path("quantite").asInt());
+            this.clientDAO.ajouterOuMettreAJourElementListeLLM(listeCourses, p.path("idProduit").asInt(), p.path("quantite").asInt());
 
 
             produits.add(Map.of(
