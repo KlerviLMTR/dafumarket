@@ -31,7 +31,6 @@ public class LlmService {
     public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits, Liste listeCourses, PostIt postIt) {
         Map<String, Object> etape1 = envoyerPromptEtExtraireIngredients(phrase);
 
-
         String message1 = etape1.get("reponseUtilisateur").toString();
 
         List<String> ingredients = (List<String>) etape1.get("ingredients");
