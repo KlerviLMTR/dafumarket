@@ -7,15 +7,29 @@ public class PostItDTO {
     private Integer idPost;
     private String titre;
     private String contenu;
+    private String reponseLLM;
 
-    public PostItDTO(Integer idPost, String titre, String contenu) {
+    public PostItDTO(Integer idPost, String titre, String contenu, String reponseLLM) {
         this.idPost = idPost;
         this.titre = titre;
         this.contenu = contenu;
+        this.reponseLLM = reponseLLM;
     }
 
-    public Integer getIdPost() { return idPost; }
-    public String getTitre()   { return titre; }
-    public String getContenu() { return contenu; }
+    public Integer getIdPost() {
+        return idPost;
+    }
+
+    public String getTitre() {
+        return titre;
+    }
+
+    public String getContenu() {
+        return contenu;
+    }
+
+    public String getReponseLLM() {
+        return reponseLLM;
+    }
 }
 

@@ -7,10 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AppartenirListeRepository
         extends JpaRepository<AppartenirListe, AppartenirListeId> {
 
     @Query("select al from AppartenirListe al  where al.liste.client.idClient = :clientId")
     List<AppartenirListe> findByClientId(@Param("clientId") Long clientId);
+
+
+    Optional<AppartenirListe> findByListe_IdListeAndProduit_IdProduit(
+            Integer idListe,
+            Integer idProduit
+    );
 }

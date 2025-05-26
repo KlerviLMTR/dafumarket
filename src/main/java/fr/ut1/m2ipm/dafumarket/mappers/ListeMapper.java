@@ -30,7 +30,8 @@ public class ListeMapper {
                 .map(pi -> new PostItDTO(
                         pi.getIdPost(),
                         pi.getTitre(),
-                        pi.getContenu()
+                        pi.getContenu(),
+                        pi.getReponseLLM()
                 ))
                 .collect(Collectors.toList());
 
