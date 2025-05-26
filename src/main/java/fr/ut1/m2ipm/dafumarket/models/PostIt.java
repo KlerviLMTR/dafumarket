@@ -20,19 +20,21 @@ public class PostIt {
     @Column(name = "contenu", columnDefinition = "TEXT", nullable = false)
     private String contenu;
 
+    @Column(name = "reponse_llm", columnDefinition = "TEXT", nullable = true)
+    private String reponseLLM;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_liste", nullable = false)
     private Liste liste;
 
 
-
-
-    public PostIt() {}
+    public PostIt() {
+    }
 
     public PostIt(String titre, String contenu, Liste liste) {
-        this.titre   = titre;
+        this.titre = titre;
         this.contenu = contenu;
-        this.liste   = liste;
+        this.liste = liste;
     }
 
     public Integer getIdPost() {
@@ -65,6 +67,14 @@ public class PostIt {
 
     public void setListe(Liste liste) {
         this.liste = liste;
+    }
+
+    public String getReponseLLM() {
+        return reponseLLM;
+    }
+
+    public void setReponseLLM(String reponseLLM) {
+        this.reponseLLM = reponseLLM;
     }
 
 }
