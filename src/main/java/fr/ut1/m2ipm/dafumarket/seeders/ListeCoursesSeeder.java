@@ -52,6 +52,7 @@ public class ListeCoursesSeeder {
         PostIt postIt2 = new PostIt("Déjeuner rapide",
                 "Wraps au hoummous, salade verte",
                 liste);
+
         postItRepo.save(postIt2);
 
         PostIt postIt3 = new PostIt("Raclette",
