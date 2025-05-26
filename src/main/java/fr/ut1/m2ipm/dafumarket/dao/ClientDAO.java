@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class ClientDAO {
@@ -176,9 +174,9 @@ public class ClientDAO {
     }
 
     @Transactional
-    public void ajouterOuMettreAJourElementListe(Liste liste,
-                                                 int idProduit,
-                                                 int quantite) {
+    public void ajouterOuMettreAJourElementListeLLM(Liste liste,
+                                                    int idProduit,
+                                                    int quantite) {
         Produit produit = produitRepository.findById(idProduit)
                 .orElseThrow(() -> new EntityNotFoundException("Produit #" + idProduit + " introuvable"));
 
@@ -188,7 +186,6 @@ public class ClientDAO {
                         liste.getIdListe(),
                         idProduit
                 );
-
         if (optLigne.isPresent()) {
             AppartenirListe ligne = optLigne.get();
             ligne.setQuantite(ligne.getQuantite() + quantite);
@@ -201,6 +198,47 @@ public class ClientDAO {
             nouvelle.setQuantite(quantite);
             appartenirListeRepository.save(nouvelle);
         }
+    }
+
+
+    @Transactional
+    public Liste ajouterOuMettreAJourElementListeUser(Liste liste,
+                                                      int idProduit,
+                                                      int quantite) {
+        // 1) charger le produit
+        Produit produit = produitRepository.findById(idProduit)
+                .orElseThrow(() -> new EntityNotFoundException("Produit #" + idProduit + " introuvable"));
+
+        // 2) rechercher la ligne existante dans la collection
+        AppartenirListe ligneExistante = null;
+        for (AppartenirListe al : liste.getItems()) {
+            if (al.getProduit().getIdProduit().equals(idProduit)) {
+                ligneExistante = al;
+                break;
+            }
+        }
+
+        if (ligneExistante != null) {
+            // 3a) si quantite == 0, on supprime de la collection (orphanRemoval la supprime en BDD)
+            if (quantite == 0) {
+                liste.getItems().remove(ligneExistante);
+            }
+            // 3b) sinon on met à jour la quantité
+            else {
+                ligneExistante.setQuantite(quantite);
+            }
+
+        } else if (quantite > 0) {
+            // 4) pas de ligne, quantite > 0 → on crée un nouveau pivot et on l'ajoute
+            AppartenirListe nouvelle = new AppartenirListe();
+            nouvelle.setId(new AppartenirListeId(liste.getIdListe(), idProduit));
+            nouvelle.setListe(liste);
+            nouvelle.setProduit(produit);
+            nouvelle.setQuantite(quantite);
+            liste.getItems().add(nouvelle);
+        }
+
+        return liste;
     }
 
 
