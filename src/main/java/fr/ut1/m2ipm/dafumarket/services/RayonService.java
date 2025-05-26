@@ -24,7 +24,11 @@ public class RayonService {
         return this.rayonDAO.getRayonById(id);
     }
 
-    public CategorieDTO mettreEnPreview(Integer idCategorie, boolean value) {
-        return this.rayonDAO.mettreEnPreview(idCategorie, value);
+    public void mettreEnPreview(Integer idCategorie, boolean value) {
+        this.rayonDAO.mettreEnPreview(idCategorie, value);
+    }
+
+    public List<CategorieDTO> getAllCategoriesPreview() {
+        return this.rayonDAO.getAllCategoriesPreview();
     }
 }

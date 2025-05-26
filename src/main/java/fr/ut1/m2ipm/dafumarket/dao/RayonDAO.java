@@ -54,15 +54,26 @@ public class RayonDAO {
         return rayon.map(RayonMapper::toDto).orElse(null);
     }
 
-    public CategorieDTO mettreEnPreview(Integer idCategorie, boolean value) {
+    public void mettreEnPreview(Integer idCategorie, boolean value) {
         // Trouver la catégorie par son ID
         Optional<Categorie> categorieOpt = categorieRepository.findById(idCategorie);
         if (categorieOpt.isPresent()) {
             Categorie c = categorieOpt.get();
             c.setEstEnPreview(value);
             categorieRepository.save(c);
+
+
         }
-        return null;
+    }
+
+    public List<CategorieDTO> getAllCategoriesPreview() {
+        List<Categorie> categories = categorieRepository.findAllByEstEnPreviewTrue();
+        List<CategorieDTO> categoriesDto = new ArrayList<>();
+        for (Categorie c : categories) {
+            CategorieDTO catDTO = new CategorieDTO(c.getIdCategorie(), c.getIntitule());
+            categoriesDto.add(catDTO);
+        }
+        return categoriesDto;
     }
 }
 

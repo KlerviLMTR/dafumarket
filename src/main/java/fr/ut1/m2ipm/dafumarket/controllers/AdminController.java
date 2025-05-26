@@ -4,6 +4,7 @@ import fr.ut1.m2ipm.dafumarket.dto.CategorieDTO;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import fr.ut1.m2ipm.dafumarket.services.PropositionService;
 import fr.ut1.m2ipm.dafumarket.services.RayonService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,8 +34,9 @@ public class AdminController {
 
 
     @PatchMapping("/preview")
-    public CategorieDTO mettreEnPreview(@RequestParam("idCategorie") Integer idCategorie, @RequestParam("value") boolean value) {
-        return this.rayonService.mettreEnPreview(idCategorie, value);
+    public ResponseEntity mettreEnPreview(@RequestParam("idCategorie") Integer idCategorie, @RequestParam("value") boolean value) {
+        this.rayonService.mettreEnPreview(idCategorie, value);
+        return ResponseEntity.noContent().build();
     }
 
 
