@@ -825,4 +825,8 @@ public class ClientService {
     }
 
 
+    public void supprimerListe(int idListe,Client c) {
+            this.clientDao.supprimerListe(idListe);
+
+    }
 }

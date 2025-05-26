@@ -130,7 +130,7 @@ public class ClientDAO {
                 .toList();
 
     }
-
+    @Transactional
     public ListeDTO getListeById(long clientId, long listeId) {
         return this.listeRepository.findByClientIdAndIdListeWithItemsAndPostIts(clientId, (int) listeId)
                 .map(ListeMapper::toDto)
@@ -138,8 +138,12 @@ public class ClientDAO {
                         "Liste " + listeId + " pour client " + clientId + " non trouvée"));
     }
 
+    @Transactional
     public Liste getListeDbModelById(long clientId, long listeId) {
+        System.out.println("Recherche liste " + listeId+ " pour client " + clientId);
+
         Optional<Liste> optList = this.listeRepository.findByClientIdAndIdListeWithItemsAndPostIts(clientId, (int) listeId);
+        System.out.println(optList);
         return optList.orElse(null);
     }
 
@@ -248,5 +252,9 @@ public class ClientDAO {
     }
 
 
+    public void supprimerListe(int idListe) {
+        System.out.println("Supprimer liste " + idListe);
+        this.listeRepository.deleteById(idListe);
+    }
 }
 
