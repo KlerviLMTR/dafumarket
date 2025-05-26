@@ -30,9 +30,11 @@ public class LlmService {
 
     public Map<String, Object> traiterRecetteAvecLLM(String phrase, List<ProduitDTO> tousLesProduits, Liste listeCourses, PostIt postIt) {
         Map<String, Object> etape1 = envoyerPromptEtExtraireIngredients(phrase);
-        System.out.println("Etape 1 : " + etape1.get("reponseUtilisateur"));
+
+
+        String message1 = etape1.get("reponseUtilisateur").toString();
+
         List<String> ingredients = (List<String>) etape1.get("ingredients");
-        System.out.println("Traiter avec LLM");
         if (ingredients == null || ingredients.isEmpty()) {
             Map<String, Object> etape2 = Map.of(
                     "reponseUtilisateur", "Aucun ingrédient détecté dans la demande.",
@@ -57,6 +59,12 @@ public class LlmService {
 
         Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson), listeCourses, postIt);
 
+        String message2 = etape2.get("reponseUtilisateur").toString();
+        String reponseBrute = etape2.get("reponseBrute").toString();
+
+        // Mettre à jour le postit
+        this.clientDAO.updatePostItLLM(postIt, message1 + "\n" + message2);
+
         return Map.of("etape1", etape1, "etape2", etape2);
     }
 
@@ -71,7 +79,6 @@ public class LlmService {
 
             HttpEntity<String> request = new HttpEntity<>(mapper.writeValueAsString(body), headers);
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
-
             return extraireReponseEtIngredients(response.getBody(), prompt);
         } catch (Exception e) {
             System.out.println("Erreur appel Mistral : " + e.getMessage());
@@ -115,7 +122,6 @@ public class LlmService {
         JsonNode contentJson = mapper.readTree(contentJsonString);
 
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
-        System.out.println("Réponse utilisateur : " + reponseUtilisateur);
         List<String> ingredients = new ArrayList<>();
         for (JsonNode node : contentJson.path("ingredients")) {
             ingredients.add(node.asText());
@@ -139,12 +145,8 @@ public class LlmService {
         String reponseUtilisateur = contentJson.path("reponseUtilisateur").asText();
         List<Map<String, Integer>> produits = new ArrayList<>();
         for (JsonNode p : contentJson.path("produitsSelectionnes")) {
-            System.out.println("Produit sélectionné : " + p.path("idProduit").asInt() + " - Quantité : " + p.path("quantite").asInt());
-            System.out.println("Texte llm :" + reponseUtilisateur);
             // Ici: ajouter les produits à la liste de courses
             this.clientDAO.ajouterOuMettreAJourElementListe(listeCourses, p.path("idProduit").asInt(), p.path("quantite").asInt());
-            // Mettre à jour le postit
-            this.clientDAO.updatePostItLLM(postit, reponseUtilisateur);
 
 
             produits.add(Map.of(
