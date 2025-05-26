@@ -593,12 +593,8 @@ public class ClientService {
             if (panier.getLignes().get(0).getProposition().getMagasin().getIdMagasin() == nouveauMagasin) {
                 // Alors ne rien faire (même magasin)
                 // Renvoyer le panier courant
-
             } else {
-
                 this.convertirPanierAvecStocksNouveauMagasin(panier, nouveauMagasin);
-
-
             }
             // Il faut récupérer le nouveau panier
             Optional<Panier> optNouveau = this.clientDao.getActivePanierDbByIdClient(idClient);
@@ -606,7 +602,7 @@ public class ClientService {
                 Panier nouveau = optNouveau.get();
                 return panierMapper.toDto(nouveau);
             } else {
-                throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
+                return null;
             }
         }
         throw new RuntimeException("Le nouveau panier n'a pas pu être récupéré");
@@ -670,12 +666,12 @@ public class ClientService {
         // Iterer dans le panier n°1 : pour chaque ligne, regarder si la proposition est dans le magasin cible
         // Si oui : l'ajouter dans les mêmes quantités que le panier initial (stocks vérifiés après)
         // Si non : ne rien faire
-
+        int nbProduitsNonDispos = 0;
         //Panier panierCible = new Panier();
         // Mettre déjà toutes les infos nécessaires au panier
         //panierCible.setClient(panier.getClient());
         //Panier panieCible = this.clientDao.createPanier(panier.getClient().getIdClient());
-
+        System.out.println("Nombre de lignes initiales:" + panier.getLignes().size());
 
         for (AppartenirPanier ligne : panier.getLignes()) {
             // verif proposition magasin 2: recuperer l'id du produit de la ligne
@@ -688,14 +684,20 @@ public class ClientService {
                 this.panierDao.ajouterLigneProduitAuPanier(panier, propositionMag2, ligne.getQuantite());
                 //this.panierDao.supprimerLigneDuPanier(ligne, panier);
             } else {
+                nbProduitsNonDispos++;
             }
         }
+        // Compter les lignes dans le panier
+        System.out.println("Nombre de produits non dispos :" + nbProduitsNonDispos);
         try {
             this.panierDao.supprimerLignesMagasin(ancienMagasin, panier);
+            if (nbProduitsNonDispos == panier.getLignes().size()) {
+                // Si tous les produits ne sont pas disponibles, supprimer le panier
+                this.panierDao.supprimerPanier(panier);
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
 
         // A la fin du parcours, supprimer l'ancien panier
         //this.panierDao.supprimerPanier(panier);

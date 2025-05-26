@@ -107,11 +107,10 @@ public class ClientController {
     public ResponseEntity<PanierDTO> convertirPanier(@RequestParam int idMagasin) {
         Compte compte = AuthUtils.getCurrentUser();
         Client client = clientDAO.getClientByCompte(compte);
-        PanierDTO p =  this.clientService.convertirPanierMagasin(client.getIdClient(), idMagasin);
+        PanierDTO p = this.clientService.convertirPanierMagasin(client.getIdClient(), idMagasin);
         System.out.println();
         return ResponseEntity.ok(p);
     }
-
 
 
     @PostMapping("/confirmerCommande")
@@ -131,10 +130,8 @@ public class ClientController {
     }
 
 
-
-
     @GetMapping("/testsgps/{idClient}/{idCommande}")
-    public ResponseEntity testsGps(@PathVariable int idClient , @PathVariable int idCommande){
+    public ResponseEntity testsGps(@PathVariable int idClient, @PathVariable int idCommande) {
         this.clientService.sendRecapitulatif(idClient, idCommande);
         return ResponseEntity.ok().build();
     }
@@ -155,7 +152,6 @@ public class ClientController {
         return this.clientService.getListeById(client.getIdClient(), idListe);
     }
 
-
     @PostMapping("/listes")
     public Liste creerListeCourses(@RequestBody String titreListe) {
         Compte compte = AuthUtils.getCurrentUser();
@@ -169,9 +165,7 @@ public class ClientController {
         return ResponseEntity.ok(clientService.traiterDemandeLLM(idPostit));
     }
 
-
     // Postits
-
     @PostMapping("/postits/{idListe}")
     public PostItDTO creerPostIt(
             @PathVariable long idListe,
