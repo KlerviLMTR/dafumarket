@@ -159,6 +159,14 @@ public class ClientController {
         return this.clientService.creerListeCourses(titreListe, client.getIdClient());
     }
 
+    @PatchMapping("/listes/{idListe}")
+    public ListeDTO ajouterElementListe(@PathVariable int idListe , @RequestParam int idProduit, @RequestParam int quantite) {
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.ajouterProduitListe(client, idListe, idProduit, quantite);
+
+    }
+
 
     @GetMapping("/postits/{idPostit}/llm")
     public ResponseEntity<ReponseLLMDTO> genererListeLLM(@PathVariable int idPostit) {

@@ -18,14 +18,11 @@ import jakarta.activation.DataSource;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -36,10 +33,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.util.UriUtils;
 
@@ -819,4 +812,15 @@ public class ClientService {
     }
 
 
+    public ListeDTO ajouterProduitListe(Client c, int idListe, int idProduit, int quantite) {
+        System.out.println("id liste:"+idListe);
+        System.out.println("id Client :"+ c.getIdClient());
+        ;
+        Liste liste = this.clientDao.getListeDbModelById(c.getIdClient(), idListe);
+        if (liste != null) {
+            this.clientDao.ajouterOuMettreAJourElementListe(liste, idProduit, quantite);
+            System.out.println("liste ok !");
+        }
+        return ListeMapper.toDto(liste);
+    }
 }

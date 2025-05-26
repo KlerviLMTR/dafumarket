@@ -188,7 +188,7 @@ public class ClientDAO {
                         liste.getIdListe(),
                         idProduit
                 );
-
+        System.out.println("AJouter ds trucs");
         if (optLigne.isPresent()) {
             AppartenirListe ligne = optLigne.get();
             ligne.setQuantite(ligne.getQuantite() + quantite);
