@@ -9,6 +9,7 @@ import fr.ut1.m2ipm.dafumarket.models.PostIt;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,6 +55,12 @@ public class LlmService {
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         Map<String, Object> etape2 = envoyerProduitsPourValidation(Map.of("propositions", propositionJson), listeCourses, postIt);
 
@@ -168,12 +175,13 @@ public class LlmService {
 
     }
 
+
     public Map<String, List<ProduitDTO>> trouverProduitsSimilaires(List<ProduitDTO> produits, List<String> ingredients) {
         Map<String, List<ProduitDTO>> resultats = new LinkedHashMap<>();
         for (String ingredient : ingredients) {
-            String[] mots = normaliserTexte(ingredient).split(" ");
+            String ingredientNormalise = normaliserTexte(ingredient);
             List<ProduitDTO> correspondants = produits.stream()
-                    .filter(p -> contientMotCle(p, mots))
+                    .filter(p -> estProduitSimilaire(p, ingredientNormalise))
                     .limit(10)
                     .collect(Collectors.toList());
             resultats.put(ingredient, correspondants);
@@ -181,15 +189,39 @@ public class LlmService {
         return resultats;
     }
 
-    private boolean contientMotCle(ProduitDTO produit, String[] motsCles) {
-        String nom = normaliserTexte(produit.getNom());
-        for (String mot : motsCles) {
-            if (!nom.contains(mot)) return false;
+    private boolean estProduitSimilaire(ProduitDTO produit, String ingredient) {
+        String nomProduit = normaliserTexte(produit.getNom());
+
+        String[] motsIngredient = ingredient.split(" ");
+        String[] motsProduit = nomProduit.split(" ");
+
+        int seuilSimilarite = 70;
+        int correspondances = 0;
+
+        for (String motIng : motsIngredient) {
+            for (String motProd : motsProduit) {
+                if (calculerSimilarite(motIng, motProd) >= seuilSimilarite) {
+                    correspondances++;
+                    break;
+                }
+            }
         }
-        return true;
+
+        return correspondances > 0;
+    }
+
+    private int calculerSimilarite(String mot1, String mot2) {
+        LevenshteinDistance distance = LevenshteinDistance.getDefaultInstance();
+        int maxLen = Math.max(mot1.length(), mot2.length());
+        if (maxLen == 0) return 100;
+        int dist = distance.apply(mot1, mot2);
+        return (int) ((1.0 - (double) dist / maxLen) * 100);
     }
 
     private String normaliserTexte(String texte) {
-        return texte == null ? "" : texte.toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", " ").trim();
+        return texte == null ? "" : texte.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }
