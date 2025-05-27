@@ -842,11 +842,58 @@ public class ClientService {
             if (liste != null && m != null) {
                 // Check si liste non vide - si oui rien ne se passe
                 if(!liste.getItems().isEmpty()){
+                    // Si un panier existe dans un autre magasin, le supprimer, sinon le recuperer
+
+                    Optional<Panier> optPanier = this.clientDao.getActivePanierDbByIdClient(client.getIdClient());
+                    Panier nouveauPanier ;
+
+                    if(optPanier.isPresent()) {
+                        Panier panier = optPanier.get();
+                        //System.out.println("id de l'ancien panier:"+panier.getIdPanier());
+
+                        // Check mag
+                        if (panier.getLignes().getFirst().getProposition().getMagasin().getIdMagasin() != idMagasin) {
+                            //Supprimer le panier dans ce cas
+                           // System.out.println("Le nouveau magasin est différent du panier en cours");
+                            this.panierDao.supprimerPanier(panier);
+                            nouveauPanier = this.clientDao.createPanier(client.getIdClient());
+                        }
+                        else{
+                            // Le panier est le même, ne rien faire
+                          //  System.out.println("Mag panier identique");
+                            nouveauPanier = panier;
+                        }
+                    }
+                    else{
+                        nouveauPanier = this.clientDao.createPanier(client.getIdClient());
+                        //System.out.println("pas de panier actif,on le crée");
+
+                    }
+                   // System.out.println("id du nouveau panier:"+nouveauPanier.getIdPanier());
+
+                    int cptElements = 0;
                     for ( AppartenirListe l : liste.getItems() ){
                         System.out.println(l.getProduit().getNom());
                         // Pour chacun, verifier si le magasin cible propose le produit
+                        Proposition proposition = this.magasinDao.getProduitProposeDbMagasinById(m.getIdMagasin(), l.getProduit().getIdProduit());
+                        if (proposition != null) {
+                            // Alors l'ajouter au panier
+                           // System.out.println("Produit  "+l.getProduit().getNom() +" proposé, on l'ajoute");
+                            this.panierDao.ajouterLigneProduitAuPanier(nouveauPanier, proposition, l.getQuantite());
+
+                        }
+                        else{
+                        //    System.out.println("Produit non proposé");
+                        }
                     }
-                    return null;
+                    if(cptElements == 0){
+                       // System.out.println("rien dans le panier; on le supprime");
+                        this.panierDao.supprimerPanier(nouveauPanier);
+                    }
+
+                    //Si a la fin rien n'a été ajouté au panier, le supprimer
+
+                    return panierMapper.toDto(nouveauPanier);
 
                 }
                 System.out.println("Liste vide");
