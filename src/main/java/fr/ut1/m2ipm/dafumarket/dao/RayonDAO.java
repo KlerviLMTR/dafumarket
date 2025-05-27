@@ -71,6 +71,7 @@ public class RayonDAO {
         List<CategorieDTO> categoriesDto = new ArrayList<>();
         for (Categorie c : categories) {
             CategorieDTO catDTO = new CategorieDTO(c.getIdCategorie(), c.getIntitule());
+            catDTO.setRayonDTO(RayonMapper.toDto(c.getRayon()));
             categoriesDto.add(catDTO);
         }
         return categoriesDto;
