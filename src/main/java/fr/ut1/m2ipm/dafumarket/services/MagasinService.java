@@ -110,6 +110,10 @@ public class MagasinService {
         Map<Integer, List<Double>> magasinToPrix = new HashMap<>();
 
         for (CommandeDTO commandeDTO : commandes) {
+            if (commandeDTO.getPanier() == null || commandeDTO.getPanier().getLignes().isEmpty()) {
+                continue;
+            }
+
             int idMagasin = commandeDTO.getPanier().getLignes().get(0).getIdMagasin();
             double totalCost = commandeDTO.getPanier().getTotalCost();
 
@@ -122,7 +126,7 @@ public class MagasinService {
             List<Double> prix = entry.getValue();
 
             double somme = prix.stream().mapToDouble(Double::doubleValue).sum();
-            int moyenne = (int) Math.round(somme / prix.size());
+            long moyenne = Math.round(somme / prix.size()); // moyenne en long
 
             MagasinDTO magasin = getMagasinById(idMagasin);
             String nomMagasin = magasin.getNom();
@@ -130,10 +134,11 @@ public class MagasinService {
             moyennes.add(new MoyenneDTO(idMagasin, nomMagasin, moyenne));
         }
 
-        //afficher les moyennes
         for (MoyenneDTO moyenne : moyennes) {
             log.info("Magasin ID: {}, Nom: {}, Moyenne: {}", moyenne.getIdMagasin(), moyenne.getNomMagasin(), moyenne.getMoyenne());
         }
+
         return moyennes;
     }
+
 }

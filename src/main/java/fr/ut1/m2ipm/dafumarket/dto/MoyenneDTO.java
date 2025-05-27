@@ -3,8 +3,8 @@ package fr.ut1.m2ipm.dafumarket.dto;
 public class MoyenneDTO {
     int idMagasin;
     String nomMagasin;
-    int moyenne;
-    public MoyenneDTO(int idMagasin, String nomMagasin, int moyenne) {
+    double moyenne;
+    public MoyenneDTO(int idMagasin, String nomMagasin, double moyenne) {
         this.idMagasin = idMagasin;
         this.nomMagasin = nomMagasin;
         this.moyenne = moyenne;
@@ -26,11 +26,11 @@ public class MoyenneDTO {
         this.nomMagasin = nomMagasin;
     }
 
-    public int getMoyenne() {
+    public double getMoyenne() {
         return moyenne;
     }
 
-    public void setMoyenne(int moyenne) {
+    public void setMoyenne(double moyenne) {
         this.moyenne = moyenne;
     }
 }
