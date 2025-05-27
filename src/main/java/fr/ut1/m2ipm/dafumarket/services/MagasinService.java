@@ -4,19 +4,22 @@ import fr.ut1.m2ipm.dafumarket.dao.CommandeDAO;
 import fr.ut1.m2ipm.dafumarket.dao.MagasinDAO;
 import fr.ut1.m2ipm.dafumarket.dto.CommandeDTO;
 import fr.ut1.m2ipm.dafumarket.dto.MagasinDTO;
+import fr.ut1.m2ipm.dafumarket.dto.MoyenneDTO;
 import fr.ut1.m2ipm.dafumarket.dto.ProduitProposeDTO;
 import fr.ut1.m2ipm.dafumarket.mappers.CommandeMapper;
 import fr.ut1.m2ipm.dafumarket.models.Commande;
 import fr.ut1.m2ipm.dafumarket.models.CommandeStatut;
+import fr.ut1.m2ipm.dafumarket.models.Magasin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MagasinService {
 
+    private static final Logger log = LoggerFactory.getLogger(MagasinService.class);
     private final MagasinDAO magasinDAO;
     private final CommandeDAO commandeDAO;
     private final CommandeMapper commandeMapper;
@@ -100,5 +103,37 @@ public class MagasinService {
 
     public List<ProduitProposeDTO> getProduitsProposesMagasinByMarque(int idMagasin, String marque) {
         return this.magasinDAO.getAllProduitsProposesByMarque(idMagasin, marque);
+    }
+
+    public List<MoyenneDTO> getMoyenneCommandesParMagasin() {
+        List<CommandeDTO> commandes = getAllCommandes();
+        Map<Integer, List<Double>> magasinToPrix = new HashMap<>();
+
+        for (CommandeDTO commandeDTO : commandes) {
+            int idMagasin = commandeDTO.getPanier().getLignes().get(0).getIdMagasin();
+            double totalCost = commandeDTO.getPanier().getTotalCost();
+
+            magasinToPrix.computeIfAbsent(idMagasin, k -> new ArrayList<>()).add(totalCost);
+        }
+
+        List<MoyenneDTO> moyennes = new ArrayList<>();
+        for (Map.Entry<Integer, List<Double>> entry : magasinToPrix.entrySet()) {
+            int idMagasin = entry.getKey();
+            List<Double> prix = entry.getValue();
+
+            double somme = prix.stream().mapToDouble(Double::doubleValue).sum();
+            int moyenne = (int) Math.round(somme / prix.size());
+
+            MagasinDTO magasin = getMagasinById(idMagasin);
+            String nomMagasin = magasin.getNom();
+
+            moyennes.add(new MoyenneDTO(idMagasin, nomMagasin, moyenne));
+        }
+
+        //afficher les moyennes
+        for (MoyenneDTO moyenne : moyennes) {
+            log.info("Magasin ID: {}, Nom: {}, Moyenne: {}", moyenne.getIdMagasin(), moyenne.getNomMagasin(), moyenne.getMoyenne());
+        }
+        return moyennes;
     }
 }
