@@ -1300,3 +1300,45 @@ Body (x-www-form-urlencoded):
 
 </details>
 ---
+
+## 🚚 Préparateur
+
+- `GET /api/preparateurs/commandes`  
+  ➜ Récupère la liste des commandes à préparer.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
+
+- `GET /api/preparateurs/commandes?dueDate=true`  
+  ➜ Récupère la liste des commandes à préparer du jour.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
+
+- `PATCH /api/preparateurs/commandes/{idCommande}?statut=start`  
+  ➜ Met à jour le statut d’une commande préparée par un préparateur en préparation.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
+
+- `PATCH /api/preparateurs/commandes/{idCommande}?statut=end`  
+  ➜ Met à jour le statut d’une commande préparée par un préparateur en finalisation.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
