@@ -433,10 +433,311 @@
       },
   ]
 
+</details>
+
+- `GET /api/produits/search?search={content}&limit={lim}`  
+  ➜ Recherche les produits par mot-clé indépendamment du magasin.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    }
+]
+
+</details> 
+
+- `GET /api/produits?marque={nomMarque}`  
+  ➜ Récupère tous les produits ou ceux d'une marque spécifique.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    }
+]
+
 </details> 
 
 - `GET /api/produits/{idProduit}`  
-  ➜ Récupère un produit par son identifiant (détails + catégories + labels, prix recommandé uniquement).
+  ➜ Récupère un produit à partir de son identifiant unique.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    {
+    "idProduit": 1,
+    "nom": "Compote bébé",
+    "poids": 0.1,
+    "description": "Compote pomme sans sucres ajoutés",
+    "nutriscore": "B",
+    "origine": "France",
+    "prixRecommande": 0.8,
+    "imageUrl": "compote.jpg",
+    "unite": "U",
+    "marque": "Nestlé",
+    "categories": [
+        {
+            "idCategorie": 3,
+            "nomCategorie": "Yaourts et desserts lactés",
+            "rayonDTO": {
+                "idRayon": 1,
+                "nomRayon": "Crèmerie et produits laitiers",
+                "categories": null
+            }
+        },
+        {
+            "idCategorie": 12,
+            "nomCategorie": "Alimentation bébé",
+            "rayonDTO": {
+                "idRayon": 4,
+                "nomRayon": "Bébé",
+                "categories": null
+            }
+        }
+    ],
+    "labels": []
+}
+
+</details> 
+
+- `GET /api/produits/rayon/{idRayon}`  
+  ➜ Récupère tous les produits d’un rayon spécifique.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    },
+    {
+        "idProduit": 2,
+        "nom": "Yaourt nature",
+        "poids": 0.125,
+        "description": "Yaourt nature brassé",
+        "nutriscore": "A",
+        "origine": "France",
+        "prixRecommande": 0.6,
+        "imageUrl": "yaourt.jpg",
+        "unite": "U",
+        "marque": "Danone",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    }
+]
+
+</details>
+
+- `GET /api/produits/categorie/{idCategorie}`  
+  ➜ Récupère tous les produits d’une catégorie spécifique.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    },
+    {
+        "idProduit": 2,
+        "nom": "Yaourt nature",
+        "poids": 0.125,
+        "description": "Yaourt nature brassé",
+        "nutriscore": "A",
+        "origine": "France",
+        "prixRecommande": 0.6,
+        "imageUrl": "yaourt.jpg",
+        "unite": "U",
+        "marque": "Danone",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    }
+]
+
+</details>
+
+- `GET /api/produits/preview`  
+  ➜ Récupère la liste des produits mis en avant dans la vue "Preview".
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": []
+    }
+]
+
+</details> 
 ---
 
 ## 💰 Propositions 
