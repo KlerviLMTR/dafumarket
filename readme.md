@@ -1028,7 +1028,7 @@
 
 </details>
 
-## 🧭 Clients
+## 👤 Clients
 
 - `GET /api/clients/{idClient}`  
   ➜ Récupère un client à partir de son identifiant.
@@ -1264,6 +1264,39 @@ Body (x-www-form-urlencoded):
   
     [
 ]
+
+</details>
+---
+
+## 👨‍💼 Admin
+
+- `POST /api/admin/csv`  
+  ➜ Crée une proposition de produits à partir d'un fichier CSV importé.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
+
+- `PATCH /api/admin/preview?idCategorie={idCategorie}&value=true`  
+  ➜ Modifie l'état "preview" d'une catégorie.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
+
+</details>
+
+- `GET /api/admin/avgcommandes`  
+  ➜ Récupère la moyenne des commandes par magasin.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    ]
 
 </details>
 ---
