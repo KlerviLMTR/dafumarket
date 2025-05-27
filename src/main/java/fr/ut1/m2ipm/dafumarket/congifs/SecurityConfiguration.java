@@ -41,6 +41,13 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/rayons/**").permitAll()
                         .requestMatchers("/api/produits/**").permitAll()
                         .requestMatchers("/api/magasins/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/v3/api-docs/").permitAll()
+                        .requestMatchers("/v2/api-docs").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/api-docs/**").permitAll()
+                        .requestMatchers("api-docs").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
