@@ -126,7 +126,7 @@ public class MagasinService {
             List<Double> prix = entry.getValue();
 
             double somme = prix.stream().mapToDouble(Double::doubleValue).sum();
-            long moyenne = Math.round(somme / prix.size()); // moyenne en long
+           double moyenne = somme/prix.size();
 
             MagasinDTO magasin = getMagasinById(idMagasin);
             String nomMagasin = magasin.getNom();
