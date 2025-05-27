@@ -50,6 +50,285 @@
 
 </details> 
 
+- `GET /api/magasins/{idMagasin}/produits`  
+  ➜ Récupère tous les produits proposés par un magasin donné.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": [],
+        "idMagasin": 2,
+        "prixMagasin": 0.99,
+        "stockDispo": 50,
+        "tauxPromo": 10,
+        "prixAvecPromo": 0.89
+    },
+    {
+        "idProduit": 3,
+        "nom": "Biscuits choco-noisettes",
+        "poids": 0.25,
+        "description": "Biscuits chocolat noisettes biologiques",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 3.2,
+        "imageUrl": "biscuit.jpg",
+        "unite": "U",
+        "marque": "Bjorg",
+        "categories": [
+            {
+                "idCategorie": 27,
+                "nomCategorie": "Biscuits",
+                "rayonDTO": {
+                    "idRayon": 10,
+                    "nomRayon": "Epicerie Sucrée",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 30,
+                "nomCategorie": "Petit-déjeuner",
+                "rayonDTO": {
+                    "idRayon": 10,
+                    "nomRayon": "Epicerie Sucrée",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": [
+            "AB (Agriculture Biologique)"
+        ],
+        "idMagasin": 2,
+        "prixMagasin": 3.99,
+        "stockDispo": 25,
+        "tauxPromo": 0,
+        "prixAvecPromo": 3.99
+    }
+]
+
+</details>
+
+- `GET /api/magasins/{idMagasin}/produits?marque={nomMarque}`  
+  ➜ Récupère les produits d’un magasin filtrés par marque.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 3,
+        "nom": "Biscuits choco-noisettes",
+        "poids": 0.25,
+        "description": "Biscuits chocolat noisettes biologiques",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 3.2,
+        "imageUrl": "biscuit.jpg",
+        "unite": "U",
+        "marque": "Bjorg",
+        "categories": [
+            {
+                "idCategorie": 27,
+                "nomCategorie": "Biscuits",
+                "rayonDTO": {
+                    "idRayon": 10,
+                    "nomRayon": "Epicerie Sucrée",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 30,
+                "nomCategorie": "Petit-déjeuner",
+                "rayonDTO": {
+                    "idRayon": 10,
+                    "nomRayon": "Epicerie Sucrée",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": [
+            "AB (Agriculture Biologique)"
+        ],
+        "idMagasin": 2,
+        "prixMagasin": 3.99,
+        "stockDispo": 25,
+        "tauxPromo": 0,
+        "prixAvecPromo": 3.99
+    }
+]
+
+</details>
+
+- `GET /api/magasins/{idMagasin}/produits/rayon/{idRayon}`  
+  ➜ Récupère les produits proposés par un magasin selon un rayon donné.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": [],
+        "idMagasin": 2,
+        "prixMagasin": 0.99,
+        "stockDispo": 50,
+        "tauxPromo": 10,
+        "prixAvecPromo": 0.89
+    }
+]
+
+</details>
+
+- `GET /api/magasins/{idMagasin}/produits/categorie/{idCategorie}`  
+  ➜ Récupère les produits proposés par un magasin selon un rayon donné.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    [
+    {
+        "idProduit": 1,
+        "nom": "Compote bébé",
+        "poids": 0.1,
+        "description": "Compote pomme sans sucres ajoutés",
+        "nutriscore": "B",
+        "origine": "France",
+        "prixRecommande": 0.8,
+        "imageUrl": "compote.jpg",
+        "unite": "U",
+        "marque": "Nestlé",
+        "categories": [
+            {
+                "idCategorie": 3,
+                "nomCategorie": "Yaourts et desserts lactés",
+                "rayonDTO": {
+                    "idRayon": 1,
+                    "nomRayon": "Crèmerie et produits laitiers",
+                    "categories": null
+                }
+            },
+            {
+                "idCategorie": 12,
+                "nomCategorie": "Alimentation bébé",
+                "rayonDTO": {
+                    "idRayon": 4,
+                    "nomRayon": "Bébé",
+                    "categories": null
+                }
+            }
+        ],
+        "labels": [],
+        "idMagasin": 2,
+        "prixMagasin": 0.99,
+        "stockDispo": 50,
+        "tauxPromo": 10,
+        "prixAvecPromo": 0.89
+    }
+]
+
+</details>
+
+- `GET /api/magasins/{idMagasin}/produits/{idProduit}`  
+  ➜ Récupère une proposition de produit spécifique dans un magasin.
+<details>
+<summary>Exemple de réponse JSON</summary>
+
+    {
+    "idProduit": 1,
+    "nom": "Compote bébé",
+    "poids": 0.1,
+    "description": "Compote pomme sans sucres ajoutés",
+    "nutriscore": "B",
+    "origine": "France",
+    "prixRecommande": 0.8,
+    "imageUrl": "compote.jpg",
+    "unite": "U",
+    "marque": "Nestlé",
+    "categories": [
+        {
+            "idCategorie": 3,
+            "nomCategorie": "Yaourts et desserts lactés",
+            "rayonDTO": {
+                "idRayon": 1,
+                "nomRayon": "Crèmerie et produits laitiers",
+                "categories": null
+            }
+        },
+        {
+            "idCategorie": 12,
+            "nomCategorie": "Alimentation bébé",
+            "rayonDTO": {
+                "idRayon": 4,
+                "nomRayon": "Bébé",
+                "categories": null
+            }
+        }
+    ],
+    "labels": [],
+    "idMagasin": 2,
+    "prixMagasin": 0.99,
+    "stockDispo": 50,
+    "tauxPromo": 10,
+    "prixAvecPromo": 0.89
+}
+
+</details>
 ---
 
 ## 🛒 Produits
