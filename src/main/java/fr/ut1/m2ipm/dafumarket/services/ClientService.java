@@ -11,6 +11,7 @@ import fr.ut1.m2ipm.dafumarket.dao.*;
 import fr.ut1.m2ipm.dafumarket.dto.*;
 import fr.ut1.m2ipm.dafumarket.mappers.*;
 import fr.ut1.m2ipm.dafumarket.models.*;
+import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirListe;
 import fr.ut1.m2ipm.dafumarket.models.associations.AppartenirPanier;
 import fr.ut1.m2ipm.dafumarket.models.associations.Proposition;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -828,5 +829,32 @@ public class ClientService {
     public void supprimerListe(int idListe,Client c) {
             this.clientDao.supprimerListe(idListe);
 
+    }
+
+    public PanierDTO convertirListe(int idListe, Client client, int idMagasin) {
+        Client c  = this.clientDao.getClientById(client.getIdClient());
+        if(c != null) {
+            // Recuperer la liste
+            Liste liste = this.clientDao.getListeDbModelById(c.getIdClient(), idListe);
+            // Recuperer le magasin choisi
+            Magasin m = this.magasinDao.getMagasinDbModelById(idMagasin);
+
+            if (liste != null && m != null) {
+                // Check si liste non vide - si oui rien ne se passe
+                if(!liste.getItems().isEmpty()){
+                    for ( AppartenirListe l : liste.getItems() ){
+                        System.out.println(l.getProduit().getNom());
+                        // Pour chacun, verifier si le magasin cible propose le produit
+                    }
+                    return null;
+
+                }
+                System.out.println("Liste vide");
+                return null;
+
+            }
+            throw new EntityNotFoundException("Le liste ou le magasin n'existent pas");
+        }
+        throw new EntityNotFoundException("Le client n'existe pas");
     }
 }

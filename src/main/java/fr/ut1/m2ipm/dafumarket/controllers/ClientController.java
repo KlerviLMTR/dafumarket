@@ -137,6 +137,14 @@ public class ClientController {
         return this.clientService.getAllListes(client.getIdClient());
     }
 
+    @GetMapping("/listes/{idListe}/conversion")
+    public PanierDTO conversionListe(@PathVariable int idListe, @RequestParam int idMagasin) {
+
+        Compte compte = AuthUtils.getCurrentUser();
+        Client client = clientDAO.getClientByCompte(compte);
+        return this.clientService.convertirListe(idListe, client, idMagasin );
+    }
+
     @GetMapping("/listes/{idListe}")
     public ListeDTO getListByIdClient(@PathVariable long idListe) {
         Compte compte = AuthUtils.getCurrentUser();
